@@ -117,7 +117,7 @@ function reportWindowSize() {
 window.onresize = reportWindowSize;
 window.onload = () => {
 
-  Promise.all([fetch("vertex.c"), fetch("fragment.c")]).then(([vertex, fragment]) => {
+  Promise.all([fetch("shader.vs"), fetch("shader.fs")]).then(([vertex, fragment]) => {
     if (!vertex.ok || !fragment.ok) {
       //throw new Error("HTTP error " + res.status)
     }
