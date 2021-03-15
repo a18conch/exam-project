@@ -7,12 +7,6 @@ function main(vertexShaderSource, fragmentShaderSource) {
 
   resizeCanvasToDisplaySize(gl.canvas);
 
-  //var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
-  //var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
-
-  console.log(vertexShaderSource);
-  console.log(fragmentShaderSource);
-
   var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
