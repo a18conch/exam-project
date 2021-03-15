@@ -1,6 +1,9 @@
 var gl;
 
 async function main(vertexShaderSource, fragmentShaderSource) {
+
+  //glMatrix.setMatrixArrayType(Array)
+
   const canvas = document.querySelector("#glCanvas");
 
   gl = canvas.getContext("webgl");
