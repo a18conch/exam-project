@@ -1,14 +1,17 @@
 var gl;
 
-function main() {
+function main(vertexShaderSource, fragmentShaderSource) {
   const canvas = document.querySelector("#glCanvas");
 
   gl = canvas.getContext("webgl");
 
   resizeCanvasToDisplaySize(gl.canvas);
 
-  var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
-  var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
+  //var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
+  //var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
+
+  console.log(vertexShaderSource);
+  console.log(fragmentShaderSource);
 
   var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -91,19 +94,19 @@ function createProgram(gl, vertexShader, fragmentShader) {
 
 function resizeCanvasToDisplaySize(canvas) {
   // Lookup the size the browser is displaying the canvas in CSS pixels.
-  const displayWidth  = canvas.clientWidth;
+  const displayWidth = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
- 
+
   // Check if the canvas is not the same size.
-  const needResize = canvas.width  !== displayWidth ||
-                     canvas.height !== displayHeight;
- 
+  const needResize = canvas.width !== displayWidth ||
+    canvas.height !== displayHeight;
+
   if (needResize) {
     // Make the canvas the same size
-    canvas.width  = displayWidth;
+    canvas.width = displayWidth;
     canvas.height = displayHeight;
   }
- 
+
   return needResize;
 }
 
@@ -112,4 +115,14 @@ function reportWindowSize() {
 }
 
 window.onresize = reportWindowSize;
-window.onload = main;
+window.onload = () => {
+
+  Promise.all([fetch("vertex.c"), fetch("fragment.c")]).then(([vertex, fragment]) => {
+    if (!vertex.ok || !fragment.ok) {
+      //throw new Error("HTTP error " + res.status)
+    }
+    return Promise.all([vertex.text(), fragment.text()]);
+  }).then(([vertex, fragment]) => {
+    main(vertex, fragment);
+  })
+}
