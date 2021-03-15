@@ -1,4 +1,8 @@
-attribute vec4 a_position;
+#version 300 es
+
+//attribute vec4 a_position;
+
+layout(location = 0) in vec4 a_position;
 
 void main(){
     

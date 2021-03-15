@@ -6,7 +6,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   const canvas = document.querySelector("#glCanvas");
 
-  gl = canvas.getContext("webgl");
+  gl = canvas.getContext("webgl2");
 
   resizeCanvasToDisplaySize(gl.canvas);
 
@@ -26,12 +26,9 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   parseObj(teapot);
 
   var positions = [
-    -0.3, -0.3,
-    -0.3, 0.3,
-    0.3, -0.3,
-    0.3, 0.3,
-    0.3, -0.3,
-    -0.3, 0.3
+    0.5, -0.5, 0.0, 1.0, 0.0, 0.0,   // bottom right
+    -0.5, -0.5, 0.0, 0.0, 1.0, 0.0,   // bottom left
+    0.0, 0.5, 0.0, 0.0, 0.0, 1.0    // top 
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
