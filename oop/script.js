@@ -10,27 +10,52 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   resizeCanvasToDisplaySize(gl.canvas);
 
-  var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+  let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+  let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-  var program = createProgram(gl, vertexShader, fragmentShader);
+  let program = createProgram(gl, vertexShader, fragmentShader);
 
-  var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+  let positionLoc = gl.getAttribLocation(program, "aPosition");
 
-  var positionBuffer = gl.createBuffer();
+  // const res = await fetch('/teapot.obj');
+  // const teapot = await res.text();
+  // parseObj(teapot);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-  const res = await fetch('/teapot.obj');
-  const teapot = await res.text();
-  parseObj(teapot);
-
-  var positions = [
-    0.5, -0.5, 0.0, 1.0, 0.0, 0.0,   // bottom right
-    -0.5, -0.5, 0.0, 0.0, 1.0, 0.0,   // bottom left
-    0.0, 0.5, 0.0, 0.0, 0.0, 1.0    // top 
+  let vertices = [
+    0.5, 0.5, 0.0,  // top right
+    0.5, -0.5, 0.0,  // bottom right
+    -0.5, -0.5, 0.0,  // bottom left
+    -0.5, 0.5, 0.0   // top left 
   ];
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  let indices = [  // note that we start from 0!
+    0, 1, 3,  // first Triangle
+    1, 2, 3   // second Triangle
+  ];
+
+  const VAO = gl.createVertexArray();
+  const VBO = gl.createBuffer(); //position buffer
+  const EBO = gl.createBuffer();
+
+  gl.bindVertexArray(VAO);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+
+  // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+  var size = 3;
+  gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+  gl.enableVertexAttribArray(positionLoc)
+  gl.vertexAttribPointer(
+    positionLoc, size, gl.FLOAT, false, 0, 0);
+
+  // Bind the position buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+  gl.bindVertexArray(null);
 
   //define the viewport
 
@@ -43,24 +68,13 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   gl.useProgram(program);
 
-  gl.enableVertexAttribArray(positionAttributeLocation);
+  //gl.enableVertexAttribArray(positionAttributeLocation);
 
-  // Bind the position buffer.
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-  var size = 2;          // 2 components per iteration
-  var type = gl.FLOAT;   // the data is 32bit floats
-  var normalize = false; // don't normalize the data
-  var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-  var offset = 0;        // start at the beginning of the buffer
-  gl.vertexAttribPointer(
-    positionAttributeLocation, size, type, normalize, stride, offset);
+  gl.bindVertexArray(VAO);
 
-  var primitiveType = gl.TRIANGLES;
-  var offset = 0;
-  var count = positions.length / size;
-  gl.drawArrays(primitiveType, offset, count);
+  //gl.drawArrays(primitiveType, offset, count);
+  gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0)
 }
 
 function parseObj(text) {
