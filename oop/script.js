@@ -1,4 +1,8 @@
 var gl;
+var displayWidth;
+var displayHeight;
+
+import { mat4, vec3, glMatrix } from '/gl-matrix/index.js'
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -17,9 +21,13 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let positionLoc = gl.getAttribLocation(program, "aPosition");
 
-  // const res = await fetch('/teapot.obj');
-  // const teapot = await res.text();
-  // parseObj(teapot);
+  const res = await fetch('/teapot.obj');
+  const teapotData = await res.text();
+
+  const { geometricVertices, faces } = parseObj(teapotData);
+
+  //vertices = geometricVertices;
+  //indices = faces;
 
   let vertices = [
     0.5, 0.5, 0.0,  // top right
@@ -45,16 +53,15 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
 
-  // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-  var size = 3;
+  // enable attributes
   gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
   gl.enableVertexAttribArray(positionLoc)
   gl.vertexAttribPointer(
-    positionLoc, size, gl.FLOAT, false, 0, 0);
+    positionLoc, 3, gl.FLOAT, false, 0, 0);
 
   // Bind the position buffer.
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+  //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
   gl.bindVertexArray(null);
 
   //define the viewport
@@ -63,12 +70,27 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //rendering
 
+  //glEnable(GL_DEPTH_TEST);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  //gl.clear(gl.COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   gl.useProgram(program);
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
+
+  let model = mat4.create();
+  let view = mat4.create();
+  let projection = mat4.create();
+
+  model = mat4.translate(mat4.create(), model, vec3.fromValues(0.5, 0, 0));
+  model = mat4.rotate(mat4.create(), model, glMatrix.toRadian(30), vec3.fromValues(0, 1, 0))
+  view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -3));
+  projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100)
+
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
 
   gl.bindVertexArray(VAO);
@@ -88,7 +110,7 @@ function parseObj(text) {
 }
 
 function getValuesFromPattern(text, pattern, faces) {
-  array = [];
+  let array = [];
   const matches = text.match(pattern);
   for (const geoVert of matches) {
     if (faces)
@@ -142,8 +164,8 @@ function createProgram(gl, vertexShader, fragmentShader) {
 
 function resizeCanvasToDisplaySize(canvas) {
   // Lookup the size the browser is displaying the canvas in CSS pixels.
-  const displayWidth = canvas.clientWidth;
-  const displayHeight = canvas.clientHeight;
+  displayWidth = canvas.clientWidth;
+  displayHeight = canvas.clientHeight;
 
   // Check if the canvas is not the same size.
   const needResize = canvas.width !== displayWidth ||
