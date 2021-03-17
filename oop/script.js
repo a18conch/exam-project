@@ -35,9 +35,6 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   //   return acc.concat([cur.x.v, cur.y.v, cur.z.v]);
   // }, []);
 
-  console.log(vertices);
-  console.log(indices);
-
   // let vertices = [
   //   0.5, 0.5, 0.0,  // top right
   //   0.5, -0.5, 0.0,  // bottom right
@@ -88,23 +85,31 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
 
-  let model = mat4.create();
-  let view = mat4.create();
-  let projection = mat4.create();
+  while (true) {
+    await new Promise(r => setTimeout(r, 5));
 
-  model = mat4.translate(mat4.create(), model, vec3.fromValues(0.5, 0, 0));
-  model = mat4.rotate(mat4.create(), model, glMatrix.toRadian(30), vec3.fromValues(0, 1, 0))
-  view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -40));
-  projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100)
+    let color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
+    gl.uniform4f(gl.getUniformLocation(program, "color"), color, color, color, 1.0);
+    console.log(color);
 
-  gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
-  gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
-  gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
+    let model = mat4.create();
+    let view = mat4.create();
+    let projection = mat4.create();
 
-  gl.bindVertexArray(VAO);
+    model = mat4.translate(mat4.create(), model, vec3.fromValues(0.5, 0, 0));
+    model = mat4.rotate(mat4.create(), model, glMatrix.toRadian(30), vec3.fromValues(0, 1, 0))
+    view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -40));
+    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100)
 
-  //gl.drawArrays(primitiveType, offset, count);
-  gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0)
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
+
+    gl.bindVertexArray(VAO);
+
+    //gl.drawArrays(primitiveType, offset, count);
+    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0)
+  }
 }
 
 function parseObj(text) {
