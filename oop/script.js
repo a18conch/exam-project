@@ -26,19 +26,28 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   const { geometricVertices, faces } = parseObj(teapotData);
 
-  //vertices = geometricVertices;
-  //indices = faces;
+  const vertices = geometricVertices.map(({ x, y, z }) => [x, y, z]).flat();
+  const indices = faces
+    .map(({ x: { v: xv }, y: { v: yv }, z: { v: zv } }) => [xv - 1, yv - 1, zv - 1])
+    .flat();
 
-  let vertices = [
-    0.5, 0.5, 0.0,  // top right
-    0.5, -0.5, 0.0,  // bottom right
-    -0.5, -0.5, 0.0,  // bottom left
-    -0.5, 0.5, 0.0   // top left 
-  ];
-  let indices = [  // note that we start from 0!
-    0, 1, 3,  // first Triangle
-    1, 2, 3   // second Triangle
-  ];
+  // indices = indices.reduce((acc, cur) => {
+  //   return acc.concat([cur.x.v, cur.y.v, cur.z.v]);
+  // }, []);
+
+  console.log(vertices);
+  console.log(indices);
+
+  // let vertices = [
+  //   0.5, 0.5, 0.0,  // top right
+  //   0.5, -0.5, 0.0,  // bottom right
+  //   -0.5, -0.5, 0.0,  // bottom left
+  //   -0.5, 0.5, 0.0   // top left 
+  // ];
+  // let indices = [  // note that we start from 0!
+  //   0, 1, 3,  // first Triangle
+  //   1, 2, 3   // second Triangle
+  // ];
 
   const VAO = gl.createVertexArray();
   const VBO = gl.createBuffer(); //position buffer
@@ -85,13 +94,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   model = mat4.translate(mat4.create(), model, vec3.fromValues(0.5, 0, 0));
   model = mat4.rotate(mat4.create(), model, glMatrix.toRadian(30), vec3.fromValues(0, 1, 0))
-  view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -3));
+  view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -40));
   projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100)
 
   gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
   gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
   gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
-
 
   gl.bindVertexArray(VAO);
 
@@ -132,7 +140,7 @@ function getFloatsFromStringFaces(text) {
 
 function getFloatsFromString(text) {
   const [x, y, z] = text.match(/-?[0-9]\d*(\.\d+)?/g);
-  return { x: parseFloat(x), y: parseFloat(y), z: parseFloat(y) };
+  return { x: parseFloat(x), y: parseFloat(y), z: parseFloat(z) };
 }
 
 function createShader(gl, type, source) {
