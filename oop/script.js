@@ -2,7 +2,7 @@ var gl;
 var displayWidth;
 var displayHeight;
 
-import { mat4, vec3, quat, glMatrix } from '/gl-matrix/index.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 import { VisualObject } from '/visual-object.js'
 
 async function main(vertexShaderSource, fragmentShaderSource) {
@@ -26,23 +26,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let worldObjects = []
 
   const data = parseObj(teapotData);
-  worldObjects.push(new VisualObject(gl, program, vec3.fromValues(-15, 0, 0), quat.create(), data));
-  worldObjects.push(new VisualObject(gl, program, vec3.fromValues(15, 0, 0), quat.create(), data));
-
-  // indices = indices.reduce((acc, cur) => {
-  //   return acc.concat([cur.x.v, cur.y.v, cur.z.v]);
-  // }, []);
-
-  // let vertices = [
-  //   0.5, 0.5, 0.0,  // top right
-  //   0.5, -0.5, 0.0,  // bottom right
-  //   -0.5, -0.5, 0.0,  // bottom left
-  //   -0.5, 0.5, 0.0   // top left 
-  // ];
-  // let indices = [  // note that we start from 0!
-  //   0, 1, 3,  // first Triangle
-  //   1, 2, 3   // second Triangle
-  // ];
+  worldObjects.push(new VisualObject(gl, program, vec3.fromValues(-15, 0, 0), quat.create(), data, vec3.fromValues(0, 1, 0)));
+  worldObjects.push(new VisualObject(gl, program, vec3.fromValues(15, 0, 0), quat.create(), data, vec3.fromValues(1, 0, 0)));
 
   //define the viewport
 
@@ -50,10 +35,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //rendering
 
-  //glEnable(GL_DEPTH_TEST);
-  gl.clearColor(0.0, 0.0, 0.0, 0.0);
-  //gl.clear(gl.COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  //gl.enable(gl.DEPTH_TEST);
+  //gl.clear(gl.COLOR_BUFFER_BIT);
 
   gl.useProgram(program);
 
@@ -72,9 +55,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
       counter = 0;
     }
 
-    let color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
-    gl.uniform4f(gl.getUniformLocation(program, "color"), 0.5, color, 0.5, 1.0);
-    //console.log(color);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 
     let view = mat4.create();
     let projection = mat4.create();

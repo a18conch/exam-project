@@ -6,11 +6,17 @@ precision mediump float;
 
 out vec4 FragColor;
 // in vec3 ourColor;
-uniform vec4 color;
+uniform vec3 color;
+uniform vec3 lightColor;
 
 void main() {
   // gl_FragColor is a special variable a fragment shader
   // is responsible for setting
-  FragColor = vec4(color); // return reddish-purple
-  // FragColor = vec4(1, 0.5, 0.5, 1); // return reddish-purple
+
+  float ambientStrength = 0.1;
+  vec3 ambient = ambientStrength * lightColor;
+
+  vec3 result = ambient * color;
+
+  FragColor = vec4(result, 1.0f); // return reddish-purple
 }

@@ -1,12 +1,13 @@
 import { WorldObject } from '/world-object.js'
-import { mat4, vec3, quat, glMatrix } from '/gl-matrix/index.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 
 class VisualObject extends WorldObject {
-    constructor(gl, program, position, rotation, meshData) {
+    constructor(gl, program, position, rotation, meshData, color = vec3.create()) {
 
         super(position, rotation);
         this.meshData = meshData;
 
+        this.color = color;
         this.init(gl, program, meshData);
     }
 
@@ -17,6 +18,10 @@ class VisualObject extends WorldObject {
         this.indices = meshData.faces
             .map(({ x: { v: xv }, y: { v: yv }, z: { v: zv } }) => [xv - 1, yv - 1, zv - 1])
             .flat();
+
+        // indices = indices.reduce((acc, cur) => {
+        //   return acc.concat([cur.x.v, cur.y.v, cur.z.v]);
+        // }, []);
 
         this.VAO = gl.createVertexArray();
         this.VBO = gl.createBuffer(); //position buffer
@@ -53,6 +58,11 @@ class VisualObject extends WorldObject {
         //model = mat4.rotate(mat4.create(), model, glMatrix.toRadian(30), vec3.fromValues(0, 1, 0))
 
         gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
+
+
+        //this.color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
+        gl.uniform3fv(gl.getUniformLocation(program, "color"), this.color);
+        gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
 
         gl.bindVertexArray(this.VAO);
 
