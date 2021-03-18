@@ -23,9 +23,11 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   const res = await fetch('/teapot.obj');
   const teapotData = await res.text();
 
+  let worldObjects = []
+
   const data = parseObj(teapotData);
-  const test = new VisualObject(gl, program, vec3.fromValues(-15, 0, 0), quat.create(), data);
-  const test2 = new VisualObject(gl, program, vec3.fromValues(15, 0, 0), quat.create(), data);
+  worldObjects.push(new VisualObject(gl, program, vec3.fromValues(-15, 0, 0), quat.create(), data));
+  worldObjects.push(new VisualObject(gl, program, vec3.fromValues(15, 0, 0), quat.create(), data));
 
   // indices = indices.reduce((acc, cur) => {
   //   return acc.concat([cur.x.v, cur.y.v, cur.z.v]);
@@ -83,15 +85,11 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
-    test.rotation = quat.rotateX(test.rotation, test.rotation, glMatrix.toRadian(0.2));
-    test.rotation = quat.rotateZ(test.rotation, test.rotation, glMatrix.toRadian(0.2));
-
-    test2.rotation = quat.rotateX(test2.rotation, test.rotation, glMatrix.toRadian(-0.2));
-    test2.rotation = quat.rotateZ(test2.rotation, test.rotation, glMatrix.toRadian(-0.2));
-    console.log(test.rotation)
-
-    test2.draw(gl, program);
-    test.draw(gl, program);
+    worldObjects.forEach((obj, i, objects) => {
+      objects[i].rotation = quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+      objects[i].rotation = quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+      obj.draw(gl, program);
+    });
   }
 }
 
