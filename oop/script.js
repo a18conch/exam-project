@@ -35,8 +35,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //rendering
 
-  //gl.enable(gl.DEPTH_TEST);
-  //gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
 
   gl.useProgram(program);
 
@@ -56,13 +55,14 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+    //gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.GL_DEPTH_BUFFER_BIT);
 
     let view = mat4.create();
     let projection = mat4.create();
 
     view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -40));
-    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100);
+    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
