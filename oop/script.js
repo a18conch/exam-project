@@ -2,7 +2,8 @@ var gl;
 var displayWidth;
 var displayHeight;
 
-import { mat4, vec3, glMatrix } from '/gl-matrix/index.js'
+import { mat4, vec3, quat, glMatrix } from '/gl-matrix/index.js'
+import { VisualObject } from '/visual-object.js'
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -19,17 +20,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let program = createProgram(gl, vertexShader, fragmentShader);
 
-  let positionLoc = gl.getAttribLocation(program, "aPosition");
-
   const res = await fetch('/teapot.obj');
   const teapotData = await res.text();
 
-  const { geometricVertices, faces } = parseObj(teapotData);
-
-  const vertices = geometricVertices.map(({ x, y, z }) => [x, y, z]).flat();
-  const indices = faces
-    .map(({ x: { v: xv }, y: { v: yv }, z: { v: zv } }) => [xv - 1, yv - 1, zv - 1])
-    .flat();
+  const data = parseObj(teapotData);
+  const test = new VisualObject(gl, program, vec3.fromValues(-15, 0, 0), quat.create(), data);
+  const test2 = new VisualObject(gl, program, vec3.fromValues(15, 0, 0), quat.create(), data);
 
   // indices = indices.reduce((acc, cur) => {
   //   return acc.concat([cur.x.v, cur.y.v, cur.z.v]);
@@ -46,30 +42,6 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   //   1, 2, 3   // second Triangle
   // ];
 
-  const VAO = gl.createVertexArray();
-  const VBO = gl.createBuffer(); //position buffer
-  const EBO = gl.createBuffer();
-
-  gl.bindVertexArray(VAO);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
-
-  // enable attributes
-  gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
-  gl.enableVertexAttribArray(positionLoc)
-  gl.vertexAttribPointer(
-    positionLoc, 3, gl.FLOAT, false, 0, 0);
-
-  // Bind the position buffer.
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-  gl.bindVertexArray(null);
-
   //define the viewport
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -85,30 +57,41 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
 
+  let time = (new Date).getTime();
+  let counter = 0;
+
   while (true) {
     await new Promise(r => setTimeout(r, 5));
 
-    let color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
-    gl.uniform4f(gl.getUniformLocation(program, "color"), color, color, color, 1.0);
-    console.log(color);
+    counter++;
+    if ((new Date).getTime() > time + 1000) {
+      time = (new Date).getTime();
+      console.log(counter);
+      counter = 0;
+    }
 
-    let model = mat4.create();
+    let color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
+    gl.uniform4f(gl.getUniformLocation(program, "color"), 0.5, color, 0.5, 1.0);
+    //console.log(color);
+
     let view = mat4.create();
     let projection = mat4.create();
 
-    model = mat4.translate(mat4.create(), model, vec3.fromValues(0.5, 0, 0));
-    model = mat4.rotate(mat4.create(), model, glMatrix.toRadian(30), vec3.fromValues(0, 1, 0))
     view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -40));
-    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100)
+    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0, 100);
 
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
-    gl.bindVertexArray(VAO);
+    test.rotation = quat.rotateX(test.rotation, test.rotation, glMatrix.toRadian(0.2));
+    test.rotation = quat.rotateZ(test.rotation, test.rotation, glMatrix.toRadian(0.2));
 
-    //gl.drawArrays(primitiveType, offset, count);
-    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0)
+    test2.rotation = quat.rotateX(test2.rotation, test.rotation, glMatrix.toRadian(-0.2));
+    test2.rotation = quat.rotateZ(test2.rotation, test.rotation, glMatrix.toRadian(-0.2));
+    console.log(test.rotation)
+
+    test2.draw(gl, program);
+    test.draw(gl, program);
   }
 }
 
