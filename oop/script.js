@@ -61,7 +61,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     let view = mat4.create();
     let projection = mat4.create();
 
-    view = mat4.translate(mat4.create(), view, vec3.fromValues(0, 0, -40));
+    let viewPos = vec3.fromValues(0, 0, -40);
+    view = mat4.translate(mat4.create(), view, viewPos);
     projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
@@ -70,7 +71,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     worldObjects.forEach((obj, i, objects) => {
       objects[i].rotation = quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
       objects[i].rotation = quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-      obj.draw(gl, program);
+      obj.draw(gl, program, viewPos);
     });
   }
 }

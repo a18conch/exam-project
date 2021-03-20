@@ -59,7 +59,7 @@ class VisualObject extends WorldObject {
         gl.bindVertexArray(null);
     }
 
-    draw(gl, program) {
+    draw(gl, program, viewPos) {
         let model = mat4.create();
 
         model = mat4.fromRotationTranslation(mat4.create(), this.rotation, this.position);
@@ -75,6 +75,7 @@ class VisualObject extends WorldObject {
         gl.uniform3fv(gl.getUniformLocation(program, "color"), this.color);
         gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
         gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
+        gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
         gl.bindVertexArray(this.VAO);
 
