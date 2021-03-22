@@ -76,6 +76,11 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     });
   }
 }
+
+function getComponentsOfTypes(types) {
+
+}
+
 function createShader(gl, type, source) {
   var shader = gl.createShader(type);
   gl.shaderSource(shader, source);
