@@ -6,6 +6,7 @@ import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 import { VisualObject } from '/visual-object.js'
 import { loadObj } from '/parse-obj.js'
 import { TransformComponent } from '/components/transformComponent.js'
+import { VAOComponent } from '/components/VAOComponent.js'
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -33,7 +34,32 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   //define the viewport
 
   let componentStorage = {}
-  componentStorage.TransformComponent = [];
+  componentStorage.TransformComponent = new TransformComponent();
+  componentStorage.VAOComponent = new VAOComponent();
+
+  componentStorage.TransformComponent.x.push(-15);
+  componentStorage.TransformComponent.y.push(0);
+  componentStorage.TransformComponent.z.push(0);
+  componentStorage.TransformComponent.xRot.push(0);
+  componentStorage.TransformComponent.yRot.push(0);
+  componentStorage.TransformComponent.zRot.push(0);
+  componentStorage.VAOComponent.VAO.push(renderData);
+
+  componentStorage.TransformComponent.x.push(-15);
+  componentStorage.TransformComponent.y.push(0);
+  componentStorage.TransformComponent.z.push(0);
+  componentStorage.TransformComponent.xRot.push(0);
+  componentStorage.TransformComponent.yRot.push(0);
+  componentStorage.TransformComponent.zRot.push(0);
+  componentStorage.VAOComponent.VAO.push(renderData);
+
+  componentStorage.TransformComponent.x.push(null);
+  componentStorage.TransformComponent.y.push(null);
+  componentStorage.TransformComponent.z.push(null);
+  componentStorage.TransformComponent.xRot.push(null);
+  componentStorage.TransformComponent.yRot.push(null);
+  componentStorage.TransformComponent.zRot.push(null);
+  componentStorage.VAOComponent.VAO.push(renderData);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -54,13 +80,13 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     counter++;
     if ((new Date).getTime() > time + 1000) {
       time = (new Date).getTime();
-      console.log(counter);
+      //console.log(counter);
       counter = 0;
     }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.clear(gl.GL_DEPTH_BUFFER_BIT);
+    //gl.clear(gl.GL_DEPTH_BUFFER_BIT);
 
     let view = mat4.create();
     let projection = mat4.create();
@@ -80,9 +106,31 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   }
 }
 
-function getComponentsOfTypes(types, allComponents) {
-  //since javascript does not use pointers we have to directly search through the list of component each time
+function renderSystem(types, allComponents, getFunction) {
+  let indices = getFunction(types, allComponents);
 
+  console.log(indices);
+}
+
+function getEntityIndexFromComponentTypes(types, allComponents) {
+  //since javascript does not use pointers we have to directly search through the list of component each time
+  let indices = [];
+
+  let length = allComponents[types[0].name][Object.keys(allComponents[types[0].name])[0]].length
+
+  outer:
+  for (let i = 0; i < length; i++) {
+    let shouldContinue = false;
+    for (let componentType of types) {
+      for (let componentAttribute in allComponents[componentType.name]) {
+        if (allComponents[componentType.name][componentAttribute][i] == null) {
+          continue outer;
+        }
+      }
+    }
+    indices.push(i);
+  }
+  return indices;
 }
 
 function createEntity(allComponents) {

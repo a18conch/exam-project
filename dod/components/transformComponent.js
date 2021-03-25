@@ -1,8 +1,13 @@
 
 class TransformComponent {
-    constructor(position, rotation) {
-        this.position = position;
-        this.rotation = rotation;
+    constructor() {
+        this.x = [];
+        this.y = [];
+        this.z = [];
+
+        this.xRot = [];
+        this.yRot = [];
+        this.zRot = [];
     }
 }
 

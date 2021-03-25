@@ -1,7 +1,7 @@
 
 class VAOComponent {
-    constructor(vao) {
-        this.vao = vao;
+    constructor() {
+        this.VAO = [];
     }
 }
 
