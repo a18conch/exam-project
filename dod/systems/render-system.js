@@ -5,7 +5,7 @@ import { vec3, quat, mat4 } from '../gl-matrix/index.js'
 
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
-        let types = [TransformComponent, RenderComponent];
+        let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'VAO', 'indicesLength'];
         this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
     }
 
@@ -13,8 +13,8 @@ class RenderSystem extends System {
         let model = mat4.create();
 
         mat4.fromRotationTranslation(model,
-            quat.fromEuler(quat.create(), entity.TransformComponent.xRot, entity.TransformComponent.yRot, entity.TransformComponent.zRot),
-            vec3.fromValues(entity.TransformComponent.x, entity.TransformComponent.y, entity.TransformComponent.z));
+            quat.fromEuler(quat.create(), entity.xRot, entity.yRot, entity.zRot),
+            vec3.fromValues(entity.x, entity.y, entity.z));
 
         //model = mat4.translate(mat4.create(), model, this.position);
 
@@ -29,10 +29,10 @@ class RenderSystem extends System {
         gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
         gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
-        gl.bindVertexArray(entity.RenderComponent.VAO);
+        gl.bindVertexArray(entity.VAO);
 
         //gl.drawArrays(primitiveType, offset, count);
-        gl.drawElements(gl.TRIANGLES, entity.RenderComponent.indicesLength, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, entity.indicesLength, gl.UNSIGNED_SHORT, 0);
     }
 }
 

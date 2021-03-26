@@ -36,15 +36,19 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //define the viewport
 
-  let transformStorage = new TransformComponent();
-  let renderStorage = new RenderComponent();
   let componentStorage = {}
-  componentStorage[transformStorage.constructor.name] = transformStorage;
-  componentStorage[renderStorage.constructor.name] = renderStorage;
+  componentStorage.x = [];
+  componentStorage.y = [];
+  componentStorage.z = [];
+  componentStorage.xRot = [];
+  componentStorage.yRot = [];
+  componentStorage.zRot = [];
+  componentStorage.VAO = [];
+  componentStorage.indicesLength = [];
 
-  createEntity(componentStorage, { TransformComponent: { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
-  createEntity(componentStorage, { TransformComponent: { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
-  createEntity(componentStorage, { RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+  createEntity(componentStorage, { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, VAO: renderData.VAO, indicesLength: renderData.indicesLength });
+  createEntity(componentStorage, { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, VAO: renderData.VAO, indicesLength: renderData.indicesLength });
+  createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -99,9 +103,7 @@ function createEntity(componentStorage, components) {
   for (let componentName in componentStorage) {
     if (components[componentName] == null)
       continue;
-    for (let attributeName in componentStorage[componentName]) {
-      componentStorage[componentName][attributeName].push(components[componentName][attributeName])
-    }
+    componentStorage[componentName].push(components[componentName]);
   }
 }
 
