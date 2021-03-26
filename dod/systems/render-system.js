@@ -4,7 +4,7 @@ import { vec3, quat, mat4 } from '../gl-matrix/index.js'
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
         //define what attributes the entity should have
-        let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'VAO', 'indicesLength'];
+        let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'wRot', 'VAO', 'indicesLength'];
         this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
     }
 
@@ -12,7 +12,7 @@ class RenderSystem extends System {
         let model = mat4.create();
 
         mat4.fromRotationTranslation(model,
-            quat.fromEuler(quat.create(), entity.xRot, entity.yRot, entity.zRot),
+            quat.fromValues(entity.xRot, entity.yRot, entity.zRot, entity.wRot),
             vec3.fromValues(entity.x, entity.y, entity.z));
 
         //model = mat4.translate(mat4.create(), model, this.position);

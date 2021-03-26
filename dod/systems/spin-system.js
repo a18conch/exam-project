@@ -1,17 +1,26 @@
 import { System } from './system.js'
-import { glMatrix } from '../gl-matrix/index.js'
+import { glMatrix, quat } from '../gl-matrix/index.js'
 
 class SpinSystem extends System {
     update(componentStorage, gl, program, viewPos) {
         //define what attributes the entity should have
-        let types = ['xRot', 'zRot'];
+        let types = ['xRot', 'yRot', 'zRot', 'wRot'];
         this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.spinObject);
     }
 
     spinObject(entity) {
-        entity.xRot += -0.2;
-        entity.zRot += -0.2;
+        let quatObject = quat.fromValues(entity.xRot, entity.yRot, entity.zRot, entity.wRot);
+        quat.rotateX(quatObject, quatObject, glMatrix.toRadian(-0.2));
+        quat.rotateZ(quatObject, quatObject, glMatrix.toRadian(-0.2));
         //console.log(entity);
+
+        entity.xRot = quatObject[0];
+        entity.yRot = quatObject[1];
+        entity.zRot = quatObject[2];
+        entity.wRot = quatObject[3];
+
+        console.log(entity);
+
         return entity;
     }
 }
