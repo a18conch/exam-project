@@ -46,8 +46,6 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   createEntity(componentStorage, { TransformComponent: { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
   createEntity(componentStorage, { RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
 
-  console.log(componentStorage);
-
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
   //rendering
