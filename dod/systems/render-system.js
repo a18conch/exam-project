@@ -1,15 +1,14 @@
-import { TransformComponent } from "../components/transform-component.js";
-import { RenderComponent } from "../components/render-component.js";
 import { System } from './system.js'
 import { vec3, quat, mat4 } from '../gl-matrix/index.js'
 
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
+        //define what attributes the entity should have
         let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'VAO', 'indicesLength'];
         this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
     }
 
-    drawObject(gl, program, viewPos, entity) {
+    drawObject(entity, gl, program, viewPos) {
         let model = mat4.create();
 
         mat4.fromRotationTranslation(model,

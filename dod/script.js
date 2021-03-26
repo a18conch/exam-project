@@ -5,9 +5,8 @@ var displayHeight;
 import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 import { VisualObject } from '/visual-object.js'
 import { loadObj } from '/parse-obj.js'
-import { TransformComponent } from '/components/transform-component.js'
-import { RenderComponent } from '/components/render-component.js'
 import { RenderSystem } from './systems/render-system.js';
+import { SpinSystem } from './systems/spin-system.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -27,6 +26,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let worldObjects = []
   let systems = [];
   systems.push(new RenderSystem);
+  systems.push(new SpinSystem);
 
   let cache = new Map();
 
