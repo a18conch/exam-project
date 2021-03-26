@@ -5,8 +5,9 @@ var displayHeight;
 import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 import { VisualObject } from '/visual-object.js'
 import { loadObj } from '/parse-obj.js'
-import { TransformComponent } from '/components/transformComponent.js'
-import { VAOComponent } from '/components/VAOComponent.js'
+import { TransformComponent } from '/components/transform-component.js'
+import { VAOComponent } from '/components/VAO-component.js'
+import { RenderSystem } from './systems/render-system.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -24,6 +25,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let program = createProgram(gl, vertexShader, fragmentShader);
 
   let worldObjects = []
+  let systems = [];
+  systems.push(new RenderSystem);
 
   let cache = new Map();
 
@@ -43,15 +46,17 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   componentStorage.TransformComponent.xRot.push(0);
   componentStorage.TransformComponent.yRot.push(0);
   componentStorage.TransformComponent.zRot.push(0);
-  componentStorage.VAOComponent.VAO.push(renderData);
+  componentStorage.VAOComponent.VAO.push(renderData.VAO);
+  componentStorage.VAOComponent.indicesLength.push(renderData.indicesLength);
 
-  componentStorage.TransformComponent.x.push(-15);
+  componentStorage.TransformComponent.x.push(15);
   componentStorage.TransformComponent.y.push(0);
   componentStorage.TransformComponent.z.push(0);
   componentStorage.TransformComponent.xRot.push(0);
   componentStorage.TransformComponent.yRot.push(0);
   componentStorage.TransformComponent.zRot.push(0);
-  componentStorage.VAOComponent.VAO.push(renderData);
+  componentStorage.VAOComponent.VAO.push(renderData.VAO);
+  componentStorage.VAOComponent.indicesLength.push(renderData.indicesLength);
 
   componentStorage.TransformComponent.x.push(null);
   componentStorage.TransformComponent.y.push(null);
@@ -59,7 +64,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   componentStorage.TransformComponent.xRot.push(null);
   componentStorage.TransformComponent.yRot.push(null);
   componentStorage.TransformComponent.zRot.push(null);
-  componentStorage.VAOComponent.VAO.push(renderData);
+  componentStorage.VAOComponent.VAO.push(renderData.VAO);
+  componentStorage.VAOComponent.indicesLength.push(renderData.indicesLength);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -98,39 +104,16 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
-    worldObjects.forEach((obj, i, objects) => {
-      quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-      quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-      obj.draw(gl, program, viewPos);
-    });
-  }
-}
+    // worldObjects.forEach((obj, i, objects) => {
+    //   quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+    //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+    //   obj.draw(gl, program, viewPos);
+    // });
 
-function renderSystem(types, allComponents, getFunction) {
-  let indices = getFunction(types, allComponents);
-
-  console.log(indices);
-}
-
-function getEntityIndexFromComponentTypes(types, allComponents) {
-  //since javascript does not use pointers we have to directly search through the list of component each time
-  let indices = [];
-
-  let length = allComponents[types[0].name][Object.keys(allComponents[types[0].name])[0]].length
-
-  outer:
-  for (let i = 0; i < length; i++) {
-    let shouldContinue = false;
-    for (let componentType of types) {
-      for (let componentAttribute in allComponents[componentType.name]) {
-        if (allComponents[componentType.name][componentAttribute][i] == null) {
-          continue outer;
-        }
-      }
+    for (let system of systems) {
+      system.update(componentStorage, gl, program, viewPos);
     }
-    indices.push(i);
   }
-  return indices;
 }
 
 function createEntity(allComponents) {
