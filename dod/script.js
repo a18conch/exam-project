@@ -5,6 +5,9 @@ var displayHeight;
 import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 import { VisualObject } from '/visual-object.js'
 import { loadObj } from '/parse-obj.js'
+import { TransformComponent } from '/components/transform-component.js'
+import { RenderComponent } from '/components/render-component.js'
+import { RenderSystem } from './systems/render-system.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -22,6 +25,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let program = createProgram(gl, vertexShader, fragmentShader);
 
   let worldObjects = []
+  let systems = [];
+  systems.push(new RenderSystem);
 
   let cache = new Map();
 
@@ -30,6 +35,18 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   worldObjects.push(new VisualObject(vec3.fromValues(15, 0, 0), quat.create(), renderData, vec3.fromValues(1, 0, 0)));
 
   //define the viewport
+
+  let transformStorage = new TransformComponent();
+  let renderStorage = new RenderComponent();
+  let componentStorage = {}
+  componentStorage[transformStorage.constructor.name] = transformStorage;
+  componentStorage[renderStorage.constructor.name] = renderStorage;
+
+  createEntity(componentStorage, { TransformComponent: { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+  createEntity(componentStorage, { TransformComponent: { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+  createEntity(componentStorage, { RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+
+  console.log(componentStorage);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -50,13 +67,13 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     counter++;
     if ((new Date).getTime() > time + 1000) {
       time = (new Date).getTime();
-      console.log(counter);
+      //console.log(counter);
       counter = 0;
     }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.clear(gl.GL_DEPTH_BUFFER_BIT);
+    //gl.clear(gl.GL_DEPTH_BUFFER_BIT);
 
     let view = mat4.create();
     let projection = mat4.create();
@@ -68,13 +85,28 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
-    worldObjects.forEach((obj, i, objects) => {
-      quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-      quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-      obj.draw(gl, program, viewPos);
-    });
+    // worldObjects.forEach((obj, i, objects) => {
+    //   quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+    //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+    //   obj.draw(gl, program, viewPos);
+    // });
+
+    for (let system of systems) {
+      system.update(componentStorage, gl, program, viewPos);
+    }
   }
 }
+
+function createEntity(componentStorage, components) {
+  for (let componentName in componentStorage) {
+    if (components[componentName] == null)
+      continue;
+    for (let attributeName in componentStorage[componentName]) {
+      componentStorage[componentName][attributeName].push(components[componentName][attributeName])
+    }
+  }
+}
+
 function createShader(gl, type, source) {
   var shader = gl.createShader(type);
   gl.shaderSource(shader, source);
