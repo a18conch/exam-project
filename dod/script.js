@@ -6,7 +6,7 @@ import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
 import { VisualObject } from '/visual-object.js'
 import { loadObj } from '/parse-obj.js'
 import { TransformComponent } from '/components/transform-component.js'
-import { VAOComponent } from '/components/VAO-component.js'
+import { RenderComponent } from '/components/render-component.js'
 import { RenderSystem } from './systems/render-system.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
@@ -36,36 +36,17 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //define the viewport
 
+  let transformStorage = new TransformComponent();
+  let renderStorage = new RenderComponent();
   let componentStorage = {}
-  componentStorage.TransformComponent = new TransformComponent();
-  componentStorage.VAOComponent = new VAOComponent();
+  componentStorage[transformStorage.constructor.name] = transformStorage;
+  componentStorage[renderStorage.constructor.name] = renderStorage;
 
-  componentStorage.TransformComponent.x.push(-15);
-  componentStorage.TransformComponent.y.push(0);
-  componentStorage.TransformComponent.z.push(0);
-  componentStorage.TransformComponent.xRot.push(0);
-  componentStorage.TransformComponent.yRot.push(0);
-  componentStorage.TransformComponent.zRot.push(0);
-  componentStorage.VAOComponent.VAO.push(renderData.VAO);
-  componentStorage.VAOComponent.indicesLength.push(renderData.indicesLength);
+  createEntity(componentStorage, { TransformComponent: { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+  createEntity(componentStorage, { TransformComponent: { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+  createEntity(componentStorage, { RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
 
-  componentStorage.TransformComponent.x.push(15);
-  componentStorage.TransformComponent.y.push(0);
-  componentStorage.TransformComponent.z.push(0);
-  componentStorage.TransformComponent.xRot.push(0);
-  componentStorage.TransformComponent.yRot.push(0);
-  componentStorage.TransformComponent.zRot.push(0);
-  componentStorage.VAOComponent.VAO.push(renderData.VAO);
-  componentStorage.VAOComponent.indicesLength.push(renderData.indicesLength);
-
-  componentStorage.TransformComponent.x.push(null);
-  componentStorage.TransformComponent.y.push(null);
-  componentStorage.TransformComponent.z.push(null);
-  componentStorage.TransformComponent.xRot.push(null);
-  componentStorage.TransformComponent.yRot.push(null);
-  componentStorage.TransformComponent.zRot.push(null);
-  componentStorage.VAOComponent.VAO.push(renderData.VAO);
-  componentStorage.VAOComponent.indicesLength.push(renderData.indicesLength);
+  console.log(componentStorage);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -116,8 +97,14 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   }
 }
 
-function createEntity(allComponents) {
-
+function createEntity(componentStorage, components) {
+  for (let componentName in componentStorage) {
+    if (components[componentName] == null)
+      continue;
+    for (let attributeName in componentStorage[componentName]) {
+      componentStorage[componentName][attributeName].push(components[componentName][attributeName])
+    }
+  }
 }
 
 function createShader(gl, type, source) {

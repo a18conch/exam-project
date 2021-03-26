@@ -16,8 +16,6 @@ class System {
                     entity[componentType.name][componentAttribute] = attribute;
                 }
             }
-            console.log(i);
-            console.log(entity);
             iterateFunction(gl, program, viewPos, entity);
         }
     }

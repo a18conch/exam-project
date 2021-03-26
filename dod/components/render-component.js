@@ -1,5 +1,5 @@
 
-class VAOComponent {
+class RenderComponent {
     constructor() {
         this.VAO = [];
         this.indicesLength = [];
@@ -7,4 +7,4 @@ class VAOComponent {
 }
 
 
-export { VAOComponent };
+export { RenderComponent };

@@ -1,11 +1,11 @@
 import { TransformComponent } from "../components/transform-component.js";
-import { VAOComponent } from "../components/VAO-component.js";
+import { RenderComponent } from "../components/render-component.js";
 import { System } from './system.js'
 import { vec3, quat, mat4 } from '../gl-matrix/index.js'
 
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
-        let types = [TransformComponent, VAOComponent];
+        let types = [TransformComponent, RenderComponent];
         this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
     }
 
@@ -29,10 +29,10 @@ class RenderSystem extends System {
         gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
         gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
-        gl.bindVertexArray(entity.VAOComponent.VAO);
+        gl.bindVertexArray(entity.RenderComponent.VAO);
 
         //gl.drawArrays(primitiveType, offset, count);
-        gl.drawElements(gl.TRIANGLES, entity.VAOComponent.indicesLength, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, entity.RenderComponent.indicesLength, gl.UNSIGNED_SHORT, 0);
     }
 }
 
