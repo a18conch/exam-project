@@ -46,9 +46,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   componentStorage.wRot = [];
   componentStorage.VAO = [];
   componentStorage.indicesLength = [];
+  componentStorage.colorR = [];
+  componentStorage.colorG = [];
+  componentStorage.colorB = [];
 
-  createEntity(componentStorage, { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength });
-  createEntity(componentStorage, { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength });
+  createEntity(componentStorage, { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 0, colorG: 1, colorB: 0 });
+  createEntity(componentStorage, { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0 });
   createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);

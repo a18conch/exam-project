@@ -4,7 +4,7 @@ import { vec3, quat, mat4 } from '../gl-matrix/index.js'
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
         //define what attributes the entity should have
-        let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'wRot', 'VAO', 'indicesLength'];
+        let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'wRot', 'VAO', 'indicesLength', 'colorR', 'colorG', 'colorB'];
         this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
     }
 
@@ -23,7 +23,7 @@ class RenderSystem extends System {
 
 
         //this.color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
-        gl.uniform3fv(gl.getUniformLocation(program, "color"), vec3.fromValues(0.5, 0.5, 0.5));
+        gl.uniform3fv(gl.getUniformLocation(program, "color"), vec3.fromValues(entity.colorR, entity.colorG, entity.colorB));
         gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
         gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
         gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
