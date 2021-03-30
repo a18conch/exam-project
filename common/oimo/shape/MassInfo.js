@@ -1,4 +1,4 @@
-import { Mat33 } from '../math/Mat33';
+import { Mat33 } from '../math/Mat33.js';
 
 /**
  * This class holds mass information of a shape.
@@ -6,7 +6,7 @@ import { Mat33 } from '../math/Mat33';
  * @author saharan
  */
 
-function MassInfo (){
+function MassInfo() {
 
     // Mass of the shape.
     this.mass = 0;

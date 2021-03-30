@@ -1,4 +1,4 @@
-import { printError } from '../../core/Utils';
+import { printError } from '../../core/Utils.js';
 
 var count = 0;
 function ProxyIdCount() { return count++; }
@@ -9,9 +9,9 @@ function ProxyIdCount() { return count++; }
  * @author lo-th
  */
 
-function Proxy( shape ) {
+function Proxy(shape) {
 
-	//The parent shape.
+    //The parent shape.
     this.shape = shape;
 
     //The axis-aligned bounding box.
@@ -19,15 +19,15 @@ function Proxy( shape ) {
 
 };
 
-Object.assign( Proxy.prototype, {
+Object.assign(Proxy.prototype, {
 
     Proxy: true,
 
-	// Update the proxy. Must be inherited by a child.
+    // Update the proxy. Must be inherited by a child.
 
-    update: function(){
+    update: function () {
 
-        printError("Proxy","Inheritance error.");
+        printError("Proxy", "Inheritance error.");
 
     }
 

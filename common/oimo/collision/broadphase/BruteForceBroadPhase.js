@@ -1,15 +1,15 @@
-import { BR_BRUTE_FORCE } from '../../constants';
-import { BroadPhase } from './BroadPhase';
-import { BasicProxy } from './BasicProxy';
+import { BR_BRUTE_FORCE } from '../../constants.js';
+import { BroadPhase } from './BroadPhase.js';
+import { BasicProxy } from './BasicProxy.js';
 
 /**
 * A broad-phase algorithm with brute-force search.
 * This always checks for all possible pairs.
 */
 
-function BruteForceBroadPhase(){
+function BruteForceBroadPhase() {
 
-    BroadPhase.call( this );
+    BroadPhase.call(this);
     this.types = BR_BRUTE_FORCE;
     //this.numProxies=0;
     ///this.maxProxies = 256;
@@ -19,17 +19,17 @@ function BruteForceBroadPhase(){
 };
 
 
-BruteForceBroadPhase.prototype = Object.assign( Object.create( BroadPhase.prototype ), {
+BruteForceBroadPhase.prototype = Object.assign(Object.create(BroadPhase.prototype), {
 
     constructor: BruteForceBroadPhase,
 
-    createProxy: function ( shape ) {
+    createProxy: function (shape) {
 
-        return new BasicProxy( shape );
+        return new BasicProxy(shape);
 
     },
 
-    addProxy: function ( proxy ) {
+    addProxy: function (proxy) {
 
         /*if(this.numProxies==this.maxProxies){
             //this.maxProxies<<=1;
@@ -44,16 +44,16 @@ BruteForceBroadPhase.prototype = Object.assign( Object.create( BroadPhase.protot
             this.proxies=newProxies;
         }*/
         //this.proxies[this.numProxies++] = proxy;
-        this.proxies.push( proxy );
+        this.proxies.push(proxy);
         //this.numProxies++;
 
     },
 
-    removeProxy: function ( proxy ) {
+    removeProxy: function (proxy) {
 
-        var n = this.proxies.indexOf( proxy );
-        if ( n > -1 ){
-            this.proxies.splice( n, 1 );
+        var n = this.proxies.indexOf(proxy);
+        if (n > -1) {
+            this.proxies.splice(n, 1);
             //this.numProxies--;
         }
 
@@ -84,16 +84,16 @@ BruteForceBroadPhase.prototype = Object.assign( Object.create( BroadPhase.protot
         //var ar1 = JSON.parse(JSON.stringify(this.proxies))
         //var ar2 = JSON.parse(JSON.stringify(this.proxies))
 
-        this.numPairChecks = l*(l-1)>>1;
+        this.numPairChecks = l * (l - 1) >> 1;
         //this.numPairChecks=this.numProxies*(this.numProxies-1)*0.5;
 
-        while( i < l ){
+        while (i < l) {
             p1 = px[i++];
             j = i + 1;
-            while( j < l ){
+            while (j < l) {
                 p2 = px[j++];
-                if ( p1.aabb.intersectTest( p2.aabb ) || !this.isAvailablePair( p1.shape, p2.shape ) ) continue;
-                this.addPair( p1.shape, p2.shape );
+                if (p1.aabb.intersectTest(p2.aabb) || !this.isAvailablePair(p1.shape, p2.shape)) continue;
+                this.addPair(p1.shape, p2.shape);
             }
         }
 

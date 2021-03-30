@@ -1,11 +1,11 @@
-import { Vec3 } from '../../math/Vec3';
+import { Vec3 } from '../../math/Vec3.js';
 
 /**
 * The class holds details of the contact point.
 * @author saharan
 */
 
-function ManifoldPoint(){
+function ManifoldPoint() {
 
     // Whether this manifold point is persisting or not.
     this.warmStarted = false;

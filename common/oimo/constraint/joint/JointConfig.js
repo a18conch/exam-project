@@ -1,6 +1,6 @@
-import { Vec3 } from '../../math/Vec3';
+import { Vec3 } from '../../math/Vec3.js';
 
-function JointConfig(){
+function JointConfig() {
 
     this.scale = 1;
     this.invScale = 1;

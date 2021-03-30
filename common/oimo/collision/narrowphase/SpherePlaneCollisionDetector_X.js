@@ -1,16 +1,16 @@
-import { CollisionDetector } from './CollisionDetector';
-import { _Math } from '../../math/Math';
-import { Vec3 } from '../../math/Vec3';
+import { CollisionDetector } from './CollisionDetector.js';
+import { _Math } from '../../math/Math.js';
+import { Vec3 } from '../../math/Vec3.js';
 
 /**
  * A collision detector which detects collisions between two spheres.
  * @author saharan 
  * @author lo-th
  */
- 
-function SpherePlaneCollisionDetector ( flip ){
 
-    CollisionDetector.call( this );
+function SpherePlaneCollisionDetector(flip) {
+
+    CollisionDetector.call(this);
 
     this.flip = flip;
 
@@ -19,11 +19,11 @@ function SpherePlaneCollisionDetector ( flip ){
 
 };
 
-SpherePlaneCollisionDetector.prototype = Object.assign( Object.create( CollisionDetector.prototype ), {
+SpherePlaneCollisionDetector.prototype = Object.assign(Object.create(CollisionDetector.prototype), {
 
     constructor: SpherePlaneCollisionDetector,
 
-    detectCollision: function ( shape1, shape2, manifold ) {
+    detectCollision: function (shape1, shape2, manifold) {
 
         var n = this.n;
         var p = this.p;
@@ -33,20 +33,20 @@ SpherePlaneCollisionDetector.prototype = Object.assign( Object.create( Collision
         var rad = s.radius;
         var len;
 
-        n.sub( s.position, pn.position );
+        n.sub(s.position, pn.position);
         //var h = _Math.dotVectors( pn.normal, n );
 
         n.x *= pn.normal.x//+ rad;
         n.y *= pn.normal.y;
         n.z *= pn.normal.z//+ rad;
 
-        
-        var len = n.lengthSq();
-        
-        if( len > 0 && len < rad * rad){//&& h > rad*rad ){
 
-            
-            len = _Math.sqrt( len );
+        var len = n.lengthSq();
+
+        if (len > 0 && len < rad * rad) {//&& h > rad*rad ){
+
+
+            len = _Math.sqrt(len);
             //len = _Math.sqrt( h );
             n.copy(pn.normal).negate();
             //n.scaleEqual( 1/len );
@@ -54,8 +54,8 @@ SpherePlaneCollisionDetector.prototype = Object.assign( Object.create( Collision
             //(0, -1, 0)
 
             //n.normalize();
-            p.copy( s.position ).addScaledVector( n, rad );
-            manifold.addPointVec( p, n, len - rad, this.flip );
+            p.copy(s.position).addScaledVector(n, rad);
+            manifold.addPointVec(p, n, len - rad, this.flip);
 
         }
 

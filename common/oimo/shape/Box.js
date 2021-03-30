@@ -1,6 +1,6 @@
-import { SHAPE_BOX, AABB_PROX } from '../constants';
-import { Shape } from './Shape';
-import { Vec3 } from '../math/Vec3';
+import { SHAPE_BOX, AABB_PROX } from '../constants.js';
+import { Shape } from './Shape.js';
+import { Vec3 } from '../math/Vec3.js';
 
 
 /**
@@ -8,39 +8,39 @@ import { Vec3 } from '../math/Vec3';
  * @author saharan
  * @author lo-th
  */
- 
-function Box ( config, Width, Height, Depth ) {
 
-    Shape.call( this, config );
+function Box(config, Width, Height, Depth) {
 
-    this.type = SHAPE_BOX;
+	Shape.call(this, config);
 
-    this.width = Width;
-    this.height = Height;
-    this.depth = Depth;
+	this.type = SHAPE_BOX;
 
-    this.halfWidth = Width * 0.5;
-    this.halfHeight = Height * 0.5;
-    this.halfDepth = Depth * 0.5;
+	this.width = Width;
+	this.height = Height;
+	this.depth = Depth;
 
-    this.dimentions = new Float32Array( 18 );
-    this.elements = new Float32Array( 24 );
+	this.halfWidth = Width * 0.5;
+	this.halfHeight = Height * 0.5;
+	this.halfDepth = Depth * 0.5;
+
+	this.dimentions = new Float32Array(18);
+	this.elements = new Float32Array(24);
 
 };
 
-Box.prototype = Object.assign( Object.create( Shape.prototype ), {
+Box.prototype = Object.assign(Object.create(Shape.prototype), {
 
 	constructor: Box,
 
-	calculateMassInfo: function ( out ) {
+	calculateMassInfo: function (out) {
 
 		var mass = this.width * this.height * this.depth * this.density;
-		var divid = 1/12;
+		var divid = 1 / 12;
 		out.mass = mass;
 		out.inertia.set(
-			mass * ( this.height * this.height + this.depth * this.depth ) * divid, 0, 0,
-			0, mass * ( this.width * this.width + this.depth * this.depth ) * divid, 0,
-			0, 0, mass * ( this.width * this.width + this.height * this.height ) * divid
+			mass * (this.height * this.height + this.depth * this.depth) * divid, 0, 0,
+			0, mass * (this.width * this.width + this.depth * this.depth) * divid, 0,
+			0, 0, mass * (this.width * this.width + this.height * this.height) * divid
 		);
 
 	},
@@ -142,7 +142,7 @@ Box.prototype = Object.assign( Object.create( Shape.prototype ), {
 			this.position.z - d - p, this.position.z + d + p
 		);
 
-		if ( this.proxy != null ) this.proxy.update();
+		if (this.proxy != null) this.proxy.update();
 
 	}
 });

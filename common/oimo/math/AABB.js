@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { _Math } from './Math.js';
 
 
 /**
@@ -8,21 +8,21 @@ import { _Math } from './Math';
  * @author lo-th
  */
 
-function AABB( minX, maxX, minY, maxY, minZ, maxZ ){
+function AABB(minX, maxX, minY, maxY, minZ, maxZ) {
 
-    this.elements = new Float32Array( 6 );
-    var te = this.elements;
+	this.elements = new Float32Array(6);
+	var te = this.elements;
 
-    te[0] = minX || 0; te[1] = minY || 0; te[2] = minZ || 0;
-    te[3] = maxX || 0; te[4] = maxY || 0; te[5] = maxZ || 0;
+	te[0] = minX || 0; te[1] = minY || 0; te[2] = minZ || 0;
+	te[3] = maxX || 0; te[4] = maxY || 0; te[5] = maxZ || 0;
 
 };
 
-Object.assign( AABB.prototype, {
+Object.assign(AABB.prototype, {
 
 	AABB: true,
 
-	set: function(minX, maxX, minY, maxY, minZ, maxZ){
+	set: function (minX, maxX, minY, maxY, minZ, maxZ) {
 
 		var te = this.elements;
 		te[0] = minX;
@@ -34,7 +34,7 @@ Object.assign( AABB.prototype, {
 		return this;
 	},
 
-	intersectTest: function ( aabb ) {
+	intersectTest: function (aabb) {
 
 		var te = this.elements;
 		var ue = aabb.elements;
@@ -42,7 +42,7 @@ Object.assign( AABB.prototype, {
 
 	},
 
-	intersectTestTwo: function ( aabb ) {
+	intersectTestTwo: function (aabb) {
 
 		var te = this.elements;
 		var ue = aabb.elements;
@@ -52,29 +52,29 @@ Object.assign( AABB.prototype, {
 
 	clone: function () {
 
-		return new this.constructor().fromArray( this.elements );
+		return new this.constructor().fromArray(this.elements);
 
 	},
 
-	copy: function ( aabb, margin ) {
+	copy: function (aabb, margin) {
 
 		var m = margin || 0;
 		var me = aabb.elements;
-		this.set( me[ 0 ]-m, me[ 3 ]+m, me[ 1 ]-m, me[ 4 ]+m, me[ 2 ]-m, me[ 5 ]+m );
+		this.set(me[0] - m, me[3] + m, me[1] - m, me[4] + m, me[2] - m, me[5] + m);
 		return this;
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function (array) {
 
-		this.elements.set( array );
+		this.elements.set(array);
 		return this;
 
 	},
 
 	// Set this AABB to the combined AABB of aabb1 and aabb2.
 
-	combine: function( aabb1, aabb2 ) {
+	combine: function (aabb1, aabb2) {
 
 		var a = aabb1.elements;
 		var b = aabb2.elements;
@@ -101,17 +101,17 @@ Object.assign( AABB.prototype, {
 		var a = te[3] - te[0];
 		var h = te[4] - te[1];
 		var d = te[5] - te[2];
-		return 2 * (a * (h + d) + h * d );
+		return 2 * (a * (h + d) + h * d);
 
 	},
 
 
 	// Get whether the AABB intersects with the point or not.
 
-	intersectsWithPoint:function(x,y,z){
+	intersectsWithPoint: function (x, y, z) {
 
 		var te = this.elements;
-		return x>=te[0] && x<=te[3] && y>=te[1] && y<=te[4] && z>=te[2] && z<=te[5];
+		return x >= te[0] && x <= te[3] && y >= te[1] && y <= te[4] && z >= te[2] && z <= te[5];
 
 	},
 
@@ -122,26 +122,26 @@ Object.assign( AABB.prototype, {
 	 * @author xprogram
 	 */
 
-	setFromPoints: function(arr){
+	setFromPoints: function (arr) {
 		this.makeEmpty();
-		for(var i = 0; i < arr.length; i++){
+		for (var i = 0; i < arr.length; i++) {
 			this.expandByPoint(arr[i]);
 		}
 	},
 
-	makeEmpty: function(){
+	makeEmpty: function () {
 		this.set(-Infinity, -Infinity, -Infinity, Infinity, Infinity, Infinity);
 	},
 
-	expandByPoint: function(pt){
+	expandByPoint: function (pt) {
 		var te = this.elements;
 		this.set(
-			_Math.min(te[ 0 ], pt.x), _Math.min(te[ 1 ], pt.y), _Math.min(te[ 2 ], pt.z),
-			_Math.max(te[ 3 ], pt.x), _Math.max(te[ 4 ], pt.y), _Math.max(te[ 5 ], pt.z)
+			_Math.min(te[0], pt.x), _Math.min(te[1], pt.y), _Math.min(te[2], pt.z),
+			_Math.max(te[3], pt.x), _Math.max(te[4], pt.y), _Math.max(te[5], pt.z)
 		);
 	},
 
-	expandByScalar: function(s){
+	expandByScalar: function (s) {
 
 		var te = this.elements;
 		te[0] += -s;

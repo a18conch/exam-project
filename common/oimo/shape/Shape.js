@@ -1,9 +1,9 @@
-import { SHAPE_NULL } from '../constants';
-import { printError } from '../core/Utils';
-import { _Math } from '../math/Math';
-import { Vec3 } from '../math/Vec3';
-import { Mat33 } from '../math/Mat33';
-import { AABB } from '../math/AABB';
+import { SHAPE_NULL } from '../constants.js';
+import { printError } from '../core/Utils.js';
+import { _Math } from '../math/Math.js';
+import { Vec3 } from '../math/Vec3.js';
+import { Mat33 } from '../math/Mat33.js';
+import { AABB } from '../math/AABB.js';
 
 var count = 0;
 function ShapeIdCount() { return count++; }
@@ -15,7 +15,7 @@ function ShapeIdCount() { return count++; }
  * @author lo-th
  */
 
-function Shape ( config ) {
+function Shape(config) {
 
     this.type = SHAPE_NULL;
 
@@ -47,10 +47,10 @@ function Shape ( config ) {
     this.rotation = new Mat33();
 
     // position of the shape in parent's coordinate system.
-    this.relativePosition = new Vec3().copy( config.relativePosition );
+    this.relativePosition = new Vec3().copy(config.relativePosition);
 
     // rotation matrix of the shape in parent's coordinate system.
-    this.relativeRotation = new Mat33().copy( config.relativeRotation );
+    this.relativeRotation = new Mat33().copy(config.relativeRotation);
 
     // axis-aligned bounding box of the shape.
     this.aabb = new AABB();
@@ -72,13 +72,13 @@ function Shape ( config ) {
 
 };
 
-Object.assign( Shape.prototype, {
+Object.assign(Shape.prototype, {
 
     Shape: true,
 
     // Calculate the mass information of the shape.
 
-    calculateMassInfo: function( out ){
+    calculateMassInfo: function (out) {
 
         printError("Shape", "Inheritance error.");
 
@@ -86,7 +86,7 @@ Object.assign( Shape.prototype, {
 
     // Update the proxy of the shape.
 
-    updateProxy: function(){
+    updateProxy: function () {
 
         printError("Shape", "Inheritance error.");
 

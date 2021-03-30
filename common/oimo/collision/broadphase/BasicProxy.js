@@ -1,4 +1,4 @@
-import { Proxy, ProxyIdCount } from './Proxy';
+import { Proxy, ProxyIdCount } from './Proxy.js';
 
 /**
 * A basic implementation of proxies.
@@ -6,15 +6,15 @@ import { Proxy, ProxyIdCount } from './Proxy';
 * @author saharan
 */
 
-function BasicProxy ( shape ) {
+function BasicProxy(shape) {
 
-    Proxy.call( this, shape );
+    Proxy.call(this, shape);
 
     this.id = ProxyIdCount();
 
 };
 
-BasicProxy.prototype = Object.assign( Object.create( Proxy.prototype ), {
+BasicProxy.prototype = Object.assign(Object.create(Proxy.prototype), {
 
     constructor: BasicProxy,
 

@@ -1,5 +1,5 @@
-import { CollisionDetector } from './CollisionDetector';
-import { _Math } from '../../math/Math';
+import { CollisionDetector } from './CollisionDetector.js';
+import { _Math } from '../../math/Math.js';
 
 /**
  * Class for checking collisions between 2 tetras,
@@ -8,16 +8,16 @@ import { _Math } from '../../math/Math';
  * body physics are possible and easier to implement.
  * @author xprogram
  */
-function TetraTetraCollisionDetector(){
+function TetraTetraCollisionDetector() {
 
     CollisionDetector.call(this);
 
 };
 
-TetraTetraCollisionDetector.prototype = Object.create( CollisionDetector.prototype );
+TetraTetraCollisionDetector.prototype = Object.create(CollisionDetector.prototype);
 TetraTetraCollisionDetector.prototype.constructor = TetraTetraCollisionDetector;
 
-TetraTetraCollisionDetector.prototype.detectCollision = function(tet1, tet2, manifold){
+TetraTetraCollisionDetector.prototype.detectCollision = function (tet1, tet2, manifold) {
     /*
      * What we are doing:
      * Each tetra is represented by four 3D triangles. The only
@@ -39,29 +39,29 @@ TetraTetraCollisionDetector.prototype.detectCollision = function(tet1, tet2, man
 
     // fs is undeclared
     var fs = fs1;
-  
-    for(i = 0; i < 4; i++){
+
+    for (i = 0; i < 4; i++) {
         vec = vs1[i];
-        for(j = 0; j < 4; j++){
+        for (j = 0; j < 4; j++) {
             j1 = vs2[fs[i].a];
             j2 = vs2[fs[i].b];
             j3 = vs2[fs[i].c];
 
-            if(
+            if (
                 this.tricheck(this.pt(vec.x, vec.y), this.pt(j1.x, j1.y), this.pt(j2.x, j2.y), this.pt(j3.x, j3.y)) &&
                 this.tricheck(this.pt(vec.x, vec.z), this.pt(j1.x, j1.z), this.pt(j2.x, j2.z), this.pt(j3.x, j3.z)) &&
                 this.tricheck(this.pt(vec.z, vec.y), this.pt(j1.z, j1.y), this.pt(j2.z, j2.y), this.pt(j3.z, j3.y))
             )
-            ts++;
+                ts++;
 
-          if(ts === 4) // Only add point if it is inside all 4 triangles
-            manifold.addPoint(vec);
+            if (ts === 4) // Only add point if it is inside all 4 triangles
+                manifold.addPoint(vec);
         }
     }
 };
 
 // Taken from: http://jsfiddle.net/PerroAZUL/zdaY8/1/
-TetraTetraCollisionDetector.prototype.tricheck = function ( p, p0, p1, p2 ){
+TetraTetraCollisionDetector.prototype.tricheck = function (p, p0, p1, p2) {
 
     var A = 0.5 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
     var sg = A < 0 ? -1 : 1;
@@ -71,8 +71,8 @@ TetraTetraCollisionDetector.prototype.tricheck = function ( p, p0, p1, p2 ){
 
 }
 
-TetraTetraCollisionDetector.prototype.pt = function (x, y){
-    return {x: x, y: y};
+TetraTetraCollisionDetector.prototype.pt = function (x, y) {
+    return { x: x, y: y };
 }
 
 

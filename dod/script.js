@@ -30,7 +30,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let cache = new Map();
 
-  let world = new OIMO.World({
+  let world = new World({
     timestep: 1 / 60,
     iterations: 8,
     broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
@@ -63,13 +63,13 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   createEntity(componentStorage,
     {
-      x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0,
-      collisionObject: world.add({ type: 'sphere', size: [w * 0.5], pos: [-15, 0, 0], move: true, world: world })
+      x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 0, colorG: 1, colorB: 0,
+      collisionObject: world.add({ type: 'sphere', size: [5], pos: [-15, 0, 0], move: true, world: world })
     });
   createEntity(componentStorage,
     {
       x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0,
-      collisionObject: world.add({ type: 'sphere', size: [w * 0.5], pos: [15, 0, 0], move: true, world: world })
+      collisionObject: world.add({ type: 'sphere', size: [5], pos: [15, 0, 0], move: true, world: world })
     });
   createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
 

@@ -1,9 +1,9 @@
-import { JOINT_DISTANCE } from '../../constants';
-import { Joint } from './Joint';
-import { LimitMotor } from './LimitMotor';
-import { Vec3 } from '../../math/Vec3';
+import { JOINT_DISTANCE } from '../../constants.js';
+import { Joint } from './Joint.js';
+import { LimitMotor } from './LimitMotor.js';
+import { Vec3 } from '../../math/Vec3.js';
 
-import { TranslationalConstraint } from './base/TranslationalConstraint';
+import { TranslationalConstraint } from './base/TranslationalConstraint.js';
 
 
 /**
@@ -13,36 +13,36 @@ import { TranslationalConstraint } from './base/TranslationalConstraint';
  * @author lo-th
  */
 
-function DistanceJoint ( config, minDistance, maxDistance ){
+function DistanceJoint(config, minDistance, maxDistance) {
 
-    Joint.call( this, config );
+    Joint.call(this, config);
 
     this.type = JOINT_DISTANCE;
-    
+
     this.nor = new Vec3();
 
     // The limit and motor information of the joint.
-    this.limitMotor = new LimitMotor( this.nor, true );
+    this.limitMotor = new LimitMotor(this.nor, true);
     this.limitMotor.lowerLimit = minDistance;
     this.limitMotor.upperLimit = maxDistance;
 
-    this.t = new TranslationalConstraint( this, this.limitMotor );
+    this.t = new TranslationalConstraint(this, this.limitMotor);
 
 };
 
-DistanceJoint.prototype = Object.assign( Object.create( Joint.prototype ), {
+DistanceJoint.prototype = Object.assign(Object.create(Joint.prototype), {
 
     constructor: DistanceJoint,
 
-    preSolve: function ( timeStep, invTimeStep ) {
+    preSolve: function (timeStep, invTimeStep) {
 
         this.updateAnchorPoints();
 
-        this.nor.sub( this.anchorPoint2, this.anchorPoint1 ).normalize();
+        this.nor.sub(this.anchorPoint2, this.anchorPoint1).normalize();
 
         // preSolve
 
-        this.t.preSolve( timeStep, invTimeStep );
+        this.t.preSolve(timeStep, invTimeStep);
 
     },
 

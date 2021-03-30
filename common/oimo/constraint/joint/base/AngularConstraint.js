@@ -1,17 +1,17 @@
-import { Vec3 } from '../../../math/Vec3';
-import { Quat } from '../../../math/Quat';
-import { Mat33 } from '../../../math/Mat33';
+import { Vec3 } from '../../../math/Vec3.js';
+import { Quat } from '../../../math/Quat.js';
+import { Mat33 } from '../../../math/Mat33.js';
 
 /**
 * An angular constraint for all axes for various joints.
 * @author saharan
 */
 
-function AngularConstraint( joint, targetOrientation ) {
+function AngularConstraint(joint, targetOrientation) {
 
     this.joint = joint;
 
-    this.targetOrientation = new Quat().invert( targetOrientation );
+    this.targetOrientation = new Quat().invert(targetOrientation);
 
     this.relativeOrientation = new Quat();
 
@@ -35,11 +35,11 @@ function AngularConstraint( joint, targetOrientation ) {
 
 };
 
-Object.assign( AngularConstraint.prototype, {
+Object.assign(AngularConstraint.prototype, {
 
     AngularConstraint: true,
 
-    preSolve: function ( timeStep, invTimeStep ) {
+    preSolve: function (timeStep, invTimeStep) {
 
         var inv, len, v;
 
@@ -47,50 +47,50 @@ Object.assign( AngularConstraint.prototype, {
         this.ii2 = this.i2.clone();
 
         v = new Mat33().add(this.ii1, this.ii2).elements;
-        inv = 1/( v[0]*(v[4]*v[8]-v[7]*v[5])  +  v[3]*(v[7]*v[2]-v[1]*v[8])  +  v[6]*(v[1]*v[5]-v[4]*v[2]) );
+        inv = 1 / (v[0] * (v[4] * v[8] - v[7] * v[5]) + v[3] * (v[7] * v[2] - v[1] * v[8]) + v[6] * (v[1] * v[5] - v[4] * v[2]));
         this.dd = new Mat33().set(
-            v[4]*v[8]-v[5]*v[7], v[2]*v[7]-v[1]*v[8], v[1]*v[5]-v[2]*v[4],
-            v[5]*v[6]-v[3]*v[8], v[0]*v[8]-v[2]*v[6], v[2]*v[3]-v[0]*v[5],
-            v[3]*v[7]-v[4]*v[6], v[1]*v[6]-v[0]*v[7], v[0]*v[4]-v[1]*v[3]
-        ).multiplyScalar( inv );
-        
-        this.relativeOrientation.invert( this.b1.orientation ).multiply( this.targetOrientation ).multiply( this.b2.orientation );
+            v[4] * v[8] - v[5] * v[7], v[2] * v[7] - v[1] * v[8], v[1] * v[5] - v[2] * v[4],
+            v[5] * v[6] - v[3] * v[8], v[0] * v[8] - v[2] * v[6], v[2] * v[3] - v[0] * v[5],
+            v[3] * v[7] - v[4] * v[6], v[1] * v[6] - v[0] * v[7], v[0] * v[4] - v[1] * v[3]
+        ).multiplyScalar(inv);
 
-        inv = this.relativeOrientation.w*2;
+        this.relativeOrientation.invert(this.b1.orientation).multiply(this.targetOrientation).multiply(this.b2.orientation);
 
-        this.vel.copy( this.relativeOrientation ).multiplyScalar( inv );
+        inv = this.relativeOrientation.w * 2;
+
+        this.vel.copy(this.relativeOrientation).multiplyScalar(inv);
 
         len = this.vel.length();
 
-        if( len > 0.02 ) {
-            len = (0.02-len)/len*invTimeStep*0.05;
-            this.vel.multiplyScalar( len );
-        }else{
-            this.vel.set(0,0,0);
+        if (len > 0.02) {
+            len = (0.02 - len) / len * invTimeStep * 0.05;
+            this.vel.multiplyScalar(len);
+        } else {
+            this.vel.set(0, 0, 0);
         }
 
-        this.rn1.copy( this.imp ).applyMatrix3( this.ii1, true );
-        this.rn2.copy( this.imp ).applyMatrix3( this.ii2, true );
+        this.rn1.copy(this.imp).applyMatrix3(this.ii1, true);
+        this.rn2.copy(this.imp).applyMatrix3(this.ii2, true);
 
-        this.a1.add( this.rn1 );
-        this.a2.sub( this.rn2 );
+        this.a1.add(this.rn1);
+        this.a2.sub(this.rn2);
 
     },
 
     solve: function () {
 
-        var r = this.a2.clone().sub( this.a1 ).sub( this.vel );
+        var r = this.a2.clone().sub(this.a1).sub(this.vel);
 
-        this.rn0.copy( r ).applyMatrix3( this.dd, true );
-        this.rn1.copy( this.rn0 ).applyMatrix3( this.ii1, true );
-        this.rn2.copy( this.rn0 ).applyMatrix3( this.ii2, true );
+        this.rn0.copy(r).applyMatrix3(this.dd, true);
+        this.rn1.copy(this.rn0).applyMatrix3(this.ii1, true);
+        this.rn2.copy(this.rn0).applyMatrix3(this.ii2, true);
 
-        this.imp.add( this.rn0 );
-        this.a1.add( this.rn1 );
-        this.a2.sub( this.rn2 );
+        this.imp.add(this.rn0);
+        this.a1.add(this.rn1);
+        this.a2.sub(this.rn2);
 
     }
 
-} );
+});
 
 export { AngularConstraint };

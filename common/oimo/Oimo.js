@@ -67,8 +67,8 @@ export { Shape } from './shape/Shape.js';
 export { Box } from './shape/Box.js';
 export { Sphere } from './shape/Sphere.js';
 export { Cylinder } from './shape/Cylinder.js';
-export { Plane } from './shape/Plane';
-export { Particle } from './shape/Particle';
+export { Plane } from './shape/Plane.js';
+export { Particle } from './shape/Particle.js';
 export { ShapeConfig } from './shape/ShapeConfig.js';
 
 //export { TetraShape } from './collision/shape/TetraShape.js';

@@ -1,6 +1,6 @@
-import { Vec3 } from '../../math/Vec3';
+import { Vec3 } from '../../math/Vec3.js';
 
-function ContactPointDataBuffer (){
+function ContactPointDataBuffer() {
 
     this.nor = new Vec3();
     this.tan = new Vec3();

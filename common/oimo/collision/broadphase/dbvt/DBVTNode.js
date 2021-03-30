@@ -1,13 +1,13 @@
-import { AABB } from '../../../math/AABB';
+import { AABB } from '../../../math/AABB.js';
 
 /**
 * A node of the dynamic bounding volume tree.
 * @author saharan
 */
 
-function DBVTNode(){
-    
-	// The first child node of this node.
+function DBVTNode() {
+
+    // The first child node of this node.
     this.child1 = null;
     // The second child node of this node.
     this.child2 = null;

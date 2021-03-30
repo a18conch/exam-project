@@ -1,5 +1,5 @@
-import { printError } from '../core/Utils';
-import { Vec3 } from '../math/Vec3';
+import { printError } from '../core/Utils.js';
+import { Vec3 } from '../math/Vec3.js';
 
 /**
  * The base class of all type of the constraints.
@@ -8,7 +8,7 @@ import { Vec3 } from '../math/Vec3';
  * @author lo-th
  */
 
-function Constraint(){
+function Constraint() {
 
     // parent world of the constraint.
     this.parent = null;
@@ -21,29 +21,29 @@ function Constraint(){
 
     // Internal
     this.addedToIsland = false;
-    
+
 }
 
-Object.assign( Constraint.prototype, {
+Object.assign(Constraint.prototype, {
 
     Constraint: true,
 
     // Prepare for solving the constraint
-    preSolve: function( timeStep, invTimeStep ){
+    preSolve: function (timeStep, invTimeStep) {
 
         printError("Constraint", "Inheritance error.");
 
     },
 
     // Solve the constraint. This is usually called iteratively.
-    solve: function(){
+    solve: function () {
 
         printError("Constraint", "Inheritance error.");
 
     },
 
     // Do the post-processing.
-    postSolve: function(){
+    postSolve: function () {
 
         printError("Constraint", "Inheritance error.");
 

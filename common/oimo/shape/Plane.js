@@ -1,25 +1,25 @@
-import { SHAPE_PLANE, AABB_PROX } from '../constants';
-import { Shape } from './Shape';
-import { _Math } from '../math/Math';
-import { Vec3 } from '../math/Vec3';
+import { SHAPE_PLANE, AABB_PROX } from '../constants.js';
+import { Shape } from './Shape.js';
+import { _Math } from '../math/Math.js';
+import { Vec3 } from '../math/Vec3.js';
 
 /**
  * Plane shape.
  * @author lo-th
  */
 
-function Plane( config, normal ) {
+function Plane(config, normal) {
 
-    Shape.call( this, config );
+    Shape.call(this, config);
 
     this.type = SHAPE_PLANE;
 
     // radius of the shape.
-    this.normal = new Vec3( 0, 1, 0 );
+    this.normal = new Vec3(0, 1, 0);
 
 };
 
-Plane.prototype = Object.assign( Object.create( Shape.prototype ), {
+Plane.prototype = Object.assign(Object.create(Shape.prototype), {
 
     constructor: Plane,
 
@@ -29,11 +29,11 @@ Plane.prototype = Object.assign( Object.create( Shape.prototype ), {
 
     },
 
-    calculateMassInfo: function ( out ) {
+    calculateMassInfo: function (out) {
 
         out.mass = this.density;//0.0001;
         var inertia = 1;
-        out.inertia.set( inertia, 0, 0, 0, inertia, 0, 0, 0, inertia );
+        out.inertia.set(inertia, 0, 0, 0, inertia, 0, 0, 0, inertia);
 
     },
 
@@ -51,7 +51,7 @@ Plane.prototype = Object.assign( Object.create( Shape.prototype ), {
             n.z === -1 ? this.position.z - p : min, n.z === 1 ? this.position.z + p : max
         );
 
-        if ( this.proxy != null ) this.proxy.update();
+        if (this.proxy != null) this.proxy.update();
 
     }
 

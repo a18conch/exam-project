@@ -1,5 +1,5 @@
-import { Vec3 } from '../math/Vec3';
-import { Mat33 } from '../math/Mat33';
+import { Vec3 } from '../math/Vec3.js';
+import { Mat33 } from '../math/Mat33.js';
 
 /**
  * A shape configuration holds common configuration data for constructing a shape.
@@ -8,8 +8,8 @@ import { Mat33 } from '../math/Mat33';
  * @author saharan
  * @author lo-th
  */
- 
-function ShapeConfig(){
+
+function ShapeConfig() {
 
     // position of the shape in parent's coordinate system.
     this.relativePosition = new Vec3();

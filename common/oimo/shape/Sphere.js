@@ -1,6 +1,6 @@
-import { SHAPE_SPHERE, AABB_PROX } from '../constants';
-import { Shape } from './Shape';
-import { _Math } from '../math/Math';
+import { SHAPE_SPHERE, AABB_PROX } from '../constants.js';
+import { Shape } from './Shape.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * Sphere shape
@@ -8,18 +8,18 @@ import { _Math } from '../math/Math';
  * @author lo-th
  */
 
-function Sphere( config, radius ) {
+function Sphere(config, radius) {
 
-    Shape.call( this, config );
+	Shape.call(this, config);
 
-    this.type = SHAPE_SPHERE;
+	this.type = SHAPE_SPHERE;
 
-    // radius of the shape.
-    this.radius = radius;
+	// radius of the shape.
+	this.radius = radius;
 
 };
 
-Sphere.prototype = Object.assign( Object.create( Shape.prototype ), {
+Sphere.prototype = Object.assign(Object.create(Shape.prototype), {
 
 	constructor: Sphere,
 
@@ -29,12 +29,12 @@ Sphere.prototype = Object.assign( Object.create( Shape.prototype ), {
 
 	},
 
-	calculateMassInfo: function ( out ) {
+	calculateMassInfo: function (out) {
 
 		var mass = this.volume() * this.radius * this.radius * this.density; //1.333 * _Math.PI * this.radius * this.radius * this.radius * this.density;
 		out.mass = mass;
 		var inertia = mass * this.radius * this.radius * 0.4;
-		out.inertia.set( inertia, 0, 0, 0, inertia, 0, 0, 0, inertia );
+		out.inertia.set(inertia, 0, 0, 0, inertia, 0, 0, 0, inertia);
 
 	},
 
@@ -48,7 +48,7 @@ Sphere.prototype = Object.assign( Object.create( Shape.prototype ), {
 			this.position.z - this.radius - p, this.position.z + this.radius + p
 		);
 
-		if ( this.proxy != null ) this.proxy.update();
+		if (this.proxy != null) this.proxy.update();
 
 	}
 

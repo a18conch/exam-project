@@ -1,16 +1,16 @@
-import { CollisionDetector } from './CollisionDetector';
-import { _Math } from '../../math/Math';
-import { Vec3 } from '../../math/Vec3';
+import { CollisionDetector } from './CollisionDetector.js';
+import { _Math } from '../../math/Math.js';
+import { Vec3 } from '../../math/Vec3.js';
 
 /**
  * A collision detector which detects collisions between two spheres.
  * @author saharan 
  * @author lo-th
  */
- 
-function BoxPlaneCollisionDetector ( flip ){
 
-    CollisionDetector.call( this );
+function BoxPlaneCollisionDetector(flip) {
+
+    CollisionDetector.call(this);
 
     this.flip = flip;
 
@@ -26,11 +26,11 @@ function BoxPlaneCollisionDetector ( flip ){
 
 };
 
-BoxPlaneCollisionDetector.prototype = Object.assign( Object.create( CollisionDetector.prototype ), {
+BoxPlaneCollisionDetector.prototype = Object.assign(Object.create(CollisionDetector.prototype), {
 
     constructor: BoxPlaneCollisionDetector,
 
-    detectCollision: function ( shape1, shape2, manifold ) {
+    detectCollision: function (shape1, shape2, manifold) {
 
         var n = this.n;
         var p = this.p;
@@ -46,91 +46,91 @@ BoxPlaneCollisionDetector.prototype = Object.assign( Object.create( CollisionDet
         var len;
         var overlap = 0;
 
-        this.dix.set( D[0], D[1], D[2] );
-        this.diy.set( D[3], D[4], D[5] );
-        this.diz.set( D[6], D[7], D[8] );
+        this.dix.set(D[0], D[1], D[2]);
+        this.diy.set(D[3], D[4], D[5]);
+        this.diz.set(D[6], D[7], D[8]);
 
-        n.sub( b.position, pn.position );
+        n.sub(b.position, pn.position);
 
         n.x *= pn.normal.x//+ rad;
         n.y *= pn.normal.y;
         n.z *= pn.normal.z//+ rad;
 
         cc.set(
-            _Math.dotVectors( this.dix, n ),
-            _Math.dotVectors( this.diy, n ),
-            _Math.dotVectors( this.diz, n )
+            _Math.dotVectors(this.dix, n),
+            _Math.dotVectors(this.diy, n),
+            _Math.dotVectors(this.diz, n)
         );
 
 
-        if( cc.x > hw ) cc.x = hw;
-        else if( cc.x < -hw ) cc.x = -hw;
+        if (cc.x > hw) cc.x = hw;
+        else if (cc.x < -hw) cc.x = -hw;
         else overlap = 1;
-        
-        if( cc.y > hh ) cc.y = hh;
-        else if( cc.y < -hh ) cc.y = -hh;
+
+        if (cc.y > hh) cc.y = hh;
+        else if (cc.y < -hh) cc.y = -hh;
         else overlap |= 2;
-        
-        if( cc.z > hd ) cc.z = hd;
-        else if( cc.z < -hd ) cc.z = -hd;
+
+        if (cc.z > hd) cc.z = hd;
+        else if (cc.z < -hd) cc.z = -hd;
         else overlap |= 4;
 
-        
 
-        if( overlap === 7 ){
+
+        if (overlap === 7) {
 
             // center of sphere is in the box
-            
+
             n.set(
                 cc.x < 0 ? hw + cc.x : hw - cc.x,
                 cc.y < 0 ? hh + cc.y : hh - cc.y,
                 cc.z < 0 ? hd + cc.z : hd - cc.z
             )
-            
-            if( n.x < n.y ){
-                if( n.x < n.z ){
+
+            if (n.x < n.y) {
+                if (n.x < n.z) {
                     len = n.x - hw;
-                    if( cc.x < 0 ){
+                    if (cc.x < 0) {
                         cc.x = -hw;
-                        n.copy( this.dix );
-                    }else{
+                        n.copy(this.dix);
+                    } else {
                         cc.x = hw;
-                        n.subEqual( this.dix );
+                        n.subEqual(this.dix);
                     }
-                }else{
+                } else {
                     len = n.z - hd;
-                    if( cc.z < 0 ){
+                    if (cc.z < 0) {
                         cc.z = -hd;
-                        n.copy( this.diz );
-                    }else{
+                        n.copy(this.diz);
+                    } else {
                         cc.z = hd;
-                        n.subEqual( this.diz );
+                        n.subEqual(this.diz);
                     }
                 }
-            }else{
-                if( n.y < n.z ){
+            } else {
+                if (n.y < n.z) {
                     len = n.y - hh;
-                    if( cc.y < 0 ){
+                    if (cc.y < 0) {
                         cc.y = -hh;
-                        n.copy( this.diy );
-                    }else{
+                        n.copy(this.diy);
+                    } else {
                         cc.y = hh;
-                        n.subEqual( this.diy );
+                        n.subEqual(this.diy);
                     }
-                }else{
+                } else {
                     len = n.z - hd;
-                    if( cc.z < 0 ){
+                    if (cc.z < 0) {
                         cc.z = -hd;
-                        n.copy( this.diz );
-                    }else{
+                        n.copy(this.diz);
+                    } else {
                         cc.z = hd;
-                        n.subEqual( this.diz );
+                        n.subEqual(this.diz);
                     }
                 }
             }
 
-            p.copy( pn.position ).addScaledVector( n, 1 );
-            manifold.addPointVec( p, n, len, this.flip );
+            p.copy(pn.position).addScaledVector(n, 1);
+            manifold.addPointVec(p, n, len, this.flip);
 
         }
 

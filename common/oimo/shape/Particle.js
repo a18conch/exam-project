@@ -1,22 +1,22 @@
-import { SHAPE_PARTICLE, AABB_PROX } from '../constants';
-import { Shape } from './Shape';
-import { _Math } from '../math/Math';
-import { Vec3 } from '../math/Vec3';
+import { SHAPE_PARTICLE, AABB_PROX } from '../constants.js';
+import { Shape } from './Shape.js';
+import { _Math } from '../math/Math.js';
+import { Vec3 } from '../math/Vec3.js';
 
 /**
  * A Particule shape
  * @author lo-th
  */
 
-function Particle( config, normal ) {
+function Particle(config, normal) {
 
-    Shape.call( this, config );
+    Shape.call(this, config);
 
     this.type = SHAPE_PARTICLE;
 
 };
 
-Particle.prototype = Object.assign( Object.create( Shape.prototype ), {
+Particle.prototype = Object.assign(Object.create(Shape.prototype), {
 
     constructor: Particle,
 
@@ -26,10 +26,10 @@ Particle.prototype = Object.assign( Object.create( Shape.prototype ), {
 
     },
 
-    calculateMassInfo: function ( out ) {
+    calculateMassInfo: function (out) {
 
         var inertia = 0;
-        out.inertia.set( inertia, 0, 0, 0, inertia, 0, 0, 0, inertia );
+        out.inertia.set(inertia, 0, 0, 0, inertia, 0, 0, 0, inertia);
 
     },
 
@@ -43,7 +43,7 @@ Particle.prototype = Object.assign( Object.create( Shape.prototype ), {
             this.position.z - p, this.position.z + p
         );
 
-        if ( this.proxy != null ) this.proxy.update();
+        if (this.proxy != null) this.proxy.update();
 
     }
 

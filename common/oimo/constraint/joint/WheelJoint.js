@@ -1,13 +1,13 @@
-import { JOINT_WHEEL } from '../../constants';
-import { Joint } from './Joint';
-import { LimitMotor } from './LimitMotor';
-import { Vec3 } from '../../math/Vec3';
-import { Quat } from '../../math/Quat';
-import { Mat33 } from '../../math/Mat33';
-import { _Math } from '../../math/Math';
+import { JOINT_WHEEL } from '../../constants.js';
+import { Joint } from './Joint.js';
+import { LimitMotor } from './LimitMotor.js';
+import { Vec3 } from '../../math/Vec3.js';
+import { Quat } from '../../math/Quat.js';
+import { Mat33 } from '../../math/Mat33.js';
+import { _Math } from '../../math/Math.js';
 
-import { Translational3Constraint } from './base/Translational3Constraint';
-import { Rotational3Constraint } from './base/Rotational3Constraint';
+import { Translational3Constraint } from './base/Translational3Constraint.js';
+import { Rotational3Constraint } from './base/Rotational3Constraint.js';
 
 /**
  * A wheel joint allows for relative rotation between two rigid bodies along two axes.
@@ -17,9 +17,9 @@ import { Rotational3Constraint } from './base/Rotational3Constraint';
  * @author lo-th
  */
 
-function WheelJoint ( config ){
+function WheelJoint(config) {
 
-    Joint.call( this, config );
+    Joint.call(this, config);
 
     this.type = JOINT_WHEEL;
 
@@ -31,27 +31,27 @@ function WheelJoint ( config ){
     this.localAngle1 = new Vec3();
     this.localAngle2 = new Vec3();
 
-    var dot = _Math.dotVectors( this.localAxis1, this.localAxis2 );
+    var dot = _Math.dotVectors(this.localAxis1, this.localAxis2);
 
-    if( dot > -1 && dot < 1 ){
+    if (dot > -1 && dot < 1) {
 
         this.localAngle1.set(
-            this.localAxis2.x - dot*this.localAxis1.x,
-            this.localAxis2.y - dot*this.localAxis1.y,
-            this.localAxis2.z - dot*this.localAxis1.z
+            this.localAxis2.x - dot * this.localAxis1.x,
+            this.localAxis2.y - dot * this.localAxis1.y,
+            this.localAxis2.z - dot * this.localAxis1.z
         ).normalize();
 
         this.localAngle2.set(
-            this.localAxis1.x - dot*this.localAxis2.x,
-            this.localAxis1.y - dot*this.localAxis2.y,
-            this.localAxis1.z - dot*this.localAxis2.z
+            this.localAxis1.x - dot * this.localAxis2.x,
+            this.localAxis1.y - dot * this.localAxis2.y,
+            this.localAxis1.z - dot * this.localAxis2.z
         ).normalize();
 
     } else {
 
-        var arc = new Mat33().setQuat( new Quat().setFromUnitVectors( this.localAxis1, this.localAxis2 ) );
-        this.localAngle1.tangent( this.localAxis1 ).normalize();
-        this.localAngle2 = this.localAngle1.clone().applyMatrix3( arc, true );
+        var arc = new Mat33().setQuat(new Quat().setFromUnitVectors(this.localAxis1, this.localAxis2));
+        this.localAngle1.tangent(this.localAxis1).normalize();
+        this.localAngle2 = this.localAngle1.clone().applyMatrix3(arc, true);
 
     }
 
@@ -67,52 +67,52 @@ function WheelJoint ( config ){
     this.bin = new Vec3();
 
     // The translational limit and motor information of the joint.
-    this.translationalLimitMotor = new LimitMotor( this.tan,true );
+    this.translationalLimitMotor = new LimitMotor(this.tan, true);
     this.translationalLimitMotor.frequency = 8;
     this.translationalLimitMotor.dampingRatio = 1;
     // The first rotational limit and motor information of the joint.
-    this.rotationalLimitMotor1 = new LimitMotor( this.tan, false );
+    this.rotationalLimitMotor1 = new LimitMotor(this.tan, false);
     // The second rotational limit and motor information of the joint.
-    this.rotationalLimitMotor2 = new LimitMotor( this.bin, false );
+    this.rotationalLimitMotor2 = new LimitMotor(this.bin, false);
 
-    this.t3 = new Translational3Constraint( this, new LimitMotor( this.nor, true ),this.translationalLimitMotor,new LimitMotor( this.bin, true ));
+    this.t3 = new Translational3Constraint(this, new LimitMotor(this.nor, true), this.translationalLimitMotor, new LimitMotor(this.bin, true));
     this.t3.weight = 1;
-    this.r3 = new Rotational3Constraint(this,new LimitMotor( this.nor, true ),this.rotationalLimitMotor1,this.rotationalLimitMotor2);
+    this.r3 = new Rotational3Constraint(this, new LimitMotor(this.nor, true), this.rotationalLimitMotor1, this.rotationalLimitMotor2);
 
 };
 
-WheelJoint.prototype = Object.assign( Object.create( Joint.prototype ), {
+WheelJoint.prototype = Object.assign(Object.create(Joint.prototype), {
 
     constructor: WheelJoint,
 
-    preSolve: function ( timeStep, invTimeStep ) {
+    preSolve: function (timeStep, invTimeStep) {
 
         this.updateAnchorPoints();
 
-        this.ax1.copy( this.localAxis1 ).applyMatrix3( this.body1.rotation, true );
-        this.an1.copy( this.localAngle1 ).applyMatrix3( this.body1.rotation, true );
+        this.ax1.copy(this.localAxis1).applyMatrix3(this.body1.rotation, true);
+        this.an1.copy(this.localAngle1).applyMatrix3(this.body1.rotation, true);
 
-        this.ax2.copy( this.localAxis2 ).applyMatrix3( this.body2.rotation, true );
-        this.an2.copy( this.localAngle2 ).applyMatrix3( this.body2.rotation, true );
+        this.ax2.copy(this.localAxis2).applyMatrix3(this.body2.rotation, true);
+        this.an2.copy(this.localAngle2).applyMatrix3(this.body2.rotation, true);
 
-        this.r3.limitMotor1.angle = _Math.dotVectors( this.ax1, this.ax2 );
+        this.r3.limitMotor1.angle = _Math.dotVectors(this.ax1, this.ax2);
 
-        var limite = _Math.dotVectors( this.an1, this.ax2 );
+        var limite = _Math.dotVectors(this.an1, this.ax2);
 
-        if( _Math.dotVectors( this.ax1, this.tmp.crossVectors( this.an1, this.ax2 ) ) < 0 ) this.rotationalLimitMotor1.angle = -limite;
+        if (_Math.dotVectors(this.ax1, this.tmp.crossVectors(this.an1, this.ax2)) < 0) this.rotationalLimitMotor1.angle = -limite;
         else this.rotationalLimitMotor1.angle = limite;
 
-        limite = _Math.dotVectors( this.an2, this.ax1 );
+        limite = _Math.dotVectors(this.an2, this.ax1);
 
-        if( _Math.dotVectors( this.ax2, this.tmp.crossVectors( this.an2, this.ax1 ) ) < 0 ) this.rotationalLimitMotor2.angle = -limite;
+        if (_Math.dotVectors(this.ax2, this.tmp.crossVectors(this.an2, this.ax1)) < 0) this.rotationalLimitMotor2.angle = -limite;
         else this.rotationalLimitMotor2.angle = limite;
 
-        this.nor.crossVectors( this.ax1, this.ax2 ).normalize();
-        this.tan.crossVectors( this.nor, this.ax2 ).normalize();
-        this.bin.crossVectors( this.nor, this.ax1 ).normalize();
-        
-        this.r3.preSolve(timeStep,invTimeStep);
-        this.t3.preSolve(timeStep,invTimeStep);
+        this.nor.crossVectors(this.ax1, this.ax2).normalize();
+        this.tan.crossVectors(this.nor, this.ax2).normalize();
+        this.bin.crossVectors(this.nor, this.ax1).normalize();
+
+        this.r3.preSolve(timeStep, invTimeStep);
+        this.t3.preSolve(timeStep, invTimeStep);
 
     },
 
