@@ -7,6 +7,7 @@ import { VisualObject } from './visual-object.js'
 import { loadObj } from './parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
 import { SpinSystem } from './systems/spin-system.js';
+import { World } from '../common/oimo/Oimo.js'
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -23,18 +24,25 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let program = createProgram(gl, vertexShader, fragmentShader);
 
-  let worldObjects = []
   let systems = [];
   systems.push(new RenderSystem);
   systems.push(new SpinSystem);
 
   let cache = new Map();
 
-  const renderData = await loadObj('./teapot.obj', cache, gl, program);
-  worldObjects.push(new VisualObject(vec3.fromValues(-15, 0, 0), quat.create(), renderData, vec3.fromValues(0, 1, 0)));
-  worldObjects.push(new VisualObject(vec3.fromValues(15, 0, 0), quat.create(), renderData, vec3.fromValues(1, 0, 0)));
+  let world = new OIMO.World({
+    timestep: 1 / 60,
+    iterations: 8,
+    broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
+    worldscale: 1, // scale full world 
+    random: true,  // randomize sample
+    info: false,   // calculate statistic or not
+    gravity: [0, -9.8, 0]
+  });
+  //floor 
+  let ground = world.add({ size: [50, 10, 50], pos: [0, -5, 0], density: 1 });
 
-  //define the viewport
+  //end floor
 
   let componentStorage = {}
   componentStorage.x = [];
@@ -49,10 +57,25 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   componentStorage.colorR = [];
   componentStorage.colorG = [];
   componentStorage.colorB = [];
+  componentStorage.collisionObject = [];
 
-  createEntity(componentStorage, { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 0, colorG: 1, colorB: 0 });
-  createEntity(componentStorage, { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0 });
+  const renderData = await loadObj('./teapot.obj', cache, gl, program);
+
+  createEntity(componentStorage,
+    {
+      x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0,
+      collisionObject: world.add({ type: 'sphere', size: [w * 0.5], pos: [-15, 0, 0], move: true, world: world })
+    });
+  createEntity(componentStorage,
+    {
+      x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0,
+      collisionObject: world.add({ type: 'sphere', size: [w * 0.5], pos: [15, 0, 0], move: true, world: world })
+    });
   createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
+
+  console.log(world);
+
+  //viewport
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -73,7 +96,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     counter++;
     if ((new Date).getTime() > time + 1000) {
       time = (new Date).getTime();
-      console.log(counter);
+      //console.log(counter);
       counter = 0;
     }
 
@@ -91,14 +114,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
-    // worldObjects.forEach((obj, i, objects) => {
-    //   quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-    //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-    //   obj.draw(gl, program, viewPos);
-    // });
-
     for (let system of systems) {
-      system.update(componentStorage, gl, program, viewPos);
+      system.update(componentStorage, gl, program, viewPos, world);
     }
   }
 }
