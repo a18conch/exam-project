@@ -25,7 +25,7 @@ class RenderSystem extends System {
         //this.color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
         gl.uniform3fv(gl.getUniformLocation(program, "color"), vec3.fromValues(entity.colorR, entity.colorG, entity.colorB));
         gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
-        gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
+        gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(20, 20, 0));
         gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
         gl.bindVertexArray(entity.VAO);
