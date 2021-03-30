@@ -3,7 +3,6 @@ var displayWidth;
 var displayHeight;
 
 import { mat4, vec3, vec4, quat, glMatrix } from './gl-matrix/index.js'
-import { VisualObject } from './visual-object.js'
 import { loadObj } from './parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
 import { SpinSystem } from './systems/spin-system.js';
@@ -61,19 +60,9 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   const renderData = await loadObj('./teapot.obj', cache, gl, program);
 
-  createEntity(componentStorage,
-    {
-      x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 0, colorG: 1, colorB: 0,
-      collisionObject: world.add({ type: 'sphere', size: [5], pos: [-15, 0, 0], move: true, world: world })
-    });
-  createEntity(componentStorage,
-    {
-      x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0, wRot: 1, VAO: renderData.VAO, indicesLength: renderData.indicesLength, colorR: 1, colorG: 0, colorB: 0,
-      collisionObject: world.add({ type: 'sphere', size: [5], pos: [15, 0, 0], move: true, world: world })
-    });
-  createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
-
-  console.log(world);
+  createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
+  createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
+  //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
 
   //viewport
 
@@ -96,7 +85,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     counter++;
     if ((new Date).getTime() > time + 1000) {
       time = (new Date).getTime();
-      //console.log(counter);
+      console.log(counter);
       counter = 0;
     }
 
@@ -107,7 +96,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     let view = mat4.create();
     let projection = mat4.create();
 
-    let viewPos = vec3.fromValues(0, 0, -40);
+    let viewPos = vec3.fromValues(0, 0, -100);
     view = mat4.translate(mat4.create(), view, viewPos);
     projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
 
@@ -118,6 +107,25 @@ async function main(vertexShaderSource, fragmentShaderSource) {
       system.update(componentStorage, gl, program, viewPos, world);
     }
   }
+}
+
+function createTeapot(componentStorage, world, x, y, z, VAO, indicesLength) {
+  createEntity(componentStorage,
+    {
+      x,
+      y,
+      z,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      wRot: 1,
+      VAO: VAO,
+      indicesLength: indicesLength,
+      colorR: 0,
+      colorG: 1,
+      colorB: 0,
+      collisionObject: world.add({ type: 'sphere', size: [9], pos: [x, y, z], move: true, world: world })
+    });
 }
 
 function createEntity(componentStorage, components) {

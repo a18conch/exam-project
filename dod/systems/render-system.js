@@ -5,7 +5,7 @@ class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
         //define what attributes the entity should have
         let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'wRot', 'VAO', 'indicesLength', 'colorR', 'colorG', 'colorB'];
-        this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
+        this.iterateEntitiesOfTypes(types, componentStorage, this.drawObject, gl, program, viewPos);
     }
 
     drawObject(entity, gl, program, viewPos) {

@@ -1,5 +1,5 @@
 class System {
-    iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, iterateFunction) {
+    iterateEntitiesOfTypes(types, componentStorage, iterateFunction, gl, program, viewPos, world) {
         //since javascript does not use pointers we have to directly search through the list of component each time
         let length = componentStorage[types[0]].length
 
@@ -13,7 +13,7 @@ class System {
                 }
                 entity[componentType] = attr;
             }
-            entity = iterateFunction(entity, gl, program, viewPos);
+            entity = iterateFunction(entity, gl, program, viewPos, world);
             for (let attrName in entity) {
                 componentStorage[attrName][i] = entity[attrName];
             }
