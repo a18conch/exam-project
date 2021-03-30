@@ -11,6 +11,8 @@ function parseObj(text) {
 function getValuesFromPattern(text, pattern, faces) {
     let array = [];
     const matches = text.match(pattern);
+    if (!matches)
+        return;
     for (const geoVert of matches) {
         if (faces)
             array.push(getFloatsFromStringFaces(geoVert));

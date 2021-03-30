@@ -30,7 +30,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let cache = new Map();
 
-  const renderData = await loadObj('/teapot.obj', cache, gl, program);
+  const renderData = await loadObj('/sphere.obj', cache, gl, program);
   worldObjects.push(new VisualObject(vec3.fromValues(-15, 0, 0), quat.create(), renderData, vec3.fromValues(0, 1, 0)));
   worldObjects.push(new VisualObject(vec3.fromValues(15, 0, 0), quat.create(), renderData, vec3.fromValues(1, 0, 0)));
 
@@ -68,12 +68,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let counter = 0;
 
   while (true) {
-    await new Promise(r => setTimeout(r, 5));
+    await new Promise(r => setTimeout(r, 1));
 
     counter++;
     if ((new Date).getTime() > time + 1000) {
       time = (new Date).getTime();
-      //console.log(counter);
+      console.log(counter);
       counter = 0;
     }
 
