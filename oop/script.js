@@ -2,10 +2,12 @@ var gl;
 var displayWidth;
 var displayHeight;
 
-import { mat4, vec3, vec4, quat, glMatrix } from './gl-matrix/index.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 import { VisualObject } from './visual-object.js'
-import { loadObj } from './parse-obj.js'
+import { loadObj } from '../common/parse-obj.js'
 import { World } from '../common/oimo/Oimo.js'
+import { OOPTest } from '../common/test.js'
+import { viewPos, perspectiveProjection } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -38,11 +40,11 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let cache = new Map();
 
-  const renderData = await loadObj('./teapot.obj', cache, gl, program);
+  const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
-
-  createTeapot(worldObjects, world, -15, 10, 0, renderData);
-  createTeapot(worldObjects, world, -12, 30, 0, renderData);
+  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world)
+  // createTeapot(worldObjects, world, -15, 10, 0, renderData);
+  // createTeapot(worldObjects, world, -12, 30, 0, renderData);
 
   //define the viewport
 
@@ -76,9 +78,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     let view = mat4.create();
     let projection = mat4.create();
 
-    let viewPos = vec3.fromValues(0, 0, -100);
     view = mat4.translate(mat4.create(), view, viewPos);
-    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
+    projection = perspectiveProjection(displayWidth, displayHeight);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
@@ -97,10 +98,6 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     //   obj.draw(gl, program, viewPos);
     // });
   }
-}
-
-function createTeapot(worldObjects, world, x, y, z, renderData) {
-  worldObjects.push(new VisualObject(vec3.fromValues(x, y, z), quat.create(), renderData, world.add({ type: 'sphere', size: [9], pos: [x, y, z], move: true, world: world }), vec3.fromValues(0, 1, 0)))
 }
 
 function createShader(gl, type, source) {
@@ -155,7 +152,7 @@ function reportWindowSize() {
 window.onresize = reportWindowSize;
 window.onload = () => {
 
-  Promise.all([fetch("shader.vs"), fetch("shader.fs")]).then(([vertex, fragment]) => {
+  Promise.all([fetch("../common/shaders/shader.vs"), fetch("../common/shaders/shader.fs")]).then(([vertex, fragment]) => {
     if (!vertex.ok || !fragment.ok) {
       //throw new Error("HTTP error " + res.status)
     }

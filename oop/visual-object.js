@@ -1,5 +1,5 @@
 import { WorldObject } from './world-object.js'
-import { mat4, vec3, vec4, quat, glMatrix } from './gl-matrix/index.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 
 class VisualObject extends WorldObject {
     constructor(position, rotation, renderData, collisionObject, color = vec3.create()) {

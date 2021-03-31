@@ -2,11 +2,13 @@ var gl;
 var displayWidth;
 var displayHeight;
 
-import { mat4, vec3, vec4, quat, glMatrix } from './gl-matrix/index.js'
-import { loadObj } from './parse-obj.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
+import { loadObj } from '../common/parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
 import { SpinSystem } from './systems/spin-system.js';
 import { World } from '../common/oimo/Oimo.js'
+import { DODTest } from '../common/test.js'
+import { viewPos, perspectiveProjection } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -39,10 +41,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     gravity: [0, -9.8, 0]
   });
   //floor 
-  let ground = world.add({ size: [50, 10, 50], pos: [0, -5, 0], density: 1 });
 
   //end floor
-
   let componentStorage = {}
   componentStorage.x = [];
   componentStorage.y = [];
@@ -58,10 +58,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   componentStorage.colorB = [];
   componentStorage.collisionObject = [];
 
-  const renderData = await loadObj('./teapot.obj', cache, gl, program);
+  const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
-  createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
-  createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
+
+  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world);
+  //createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
+  //createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
   //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
 
   //viewport
@@ -96,9 +98,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     let view = mat4.create();
     let projection = mat4.create();
 
-    let viewPos = vec3.fromValues(0, 0, -100);
     view = mat4.translate(mat4.create(), view, viewPos);
-    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
+    projection = perspectiveProjection(displayWidth, displayHeight);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
@@ -107,25 +108,6 @@ async function main(vertexShaderSource, fragmentShaderSource) {
       system.update(componentStorage, gl, program, viewPos, world);
     }
   }
-}
-
-function createTeapot(componentStorage, world, x, y, z, VAO, indicesLength) {
-  createEntity(componentStorage,
-    {
-      x,
-      y,
-      z,
-      xRot: 0,
-      yRot: 0,
-      zRot: 0,
-      wRot: 1,
-      VAO: VAO,
-      indicesLength: indicesLength,
-      colorR: 0,
-      colorG: 1,
-      colorB: 0,
-      collisionObject: world.add({ type: 'sphere', size: [9], pos: [x, y, z], move: true, world: world })
-    });
 }
 
 function createEntity(componentStorage, components) {
@@ -188,7 +170,7 @@ function reportWindowSize() {
 window.onresize = reportWindowSize;
 window.onload = () => {
 
-  Promise.all([fetch("shader.vs"), fetch("shader.fs")]).then(([vertex, fragment]) => {
+  Promise.all([fetch("../common/shaders/shader.vs"), fetch("../common/shaders/shader.fs")]).then(([vertex, fragment]) => {
     if (!vertex.ok || !fragment.ok) {
       //throw new Error("HTTP error " + res.status)
     }

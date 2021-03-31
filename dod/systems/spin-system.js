@@ -1,5 +1,4 @@
 import { System } from './system.js'
-import { glMatrix, quat } from '../gl-matrix/index.js'
 
 class SpinSystem extends System {
     update(componentStorage, gl, program, viewPos, world) {

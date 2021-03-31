@@ -1,5 +1,5 @@
 import { System } from './system.js'
-import { vec3, quat, mat4 } from '../gl-matrix/index.js'
+import { vec3, quat, mat4 } from '../../common/gl-matrix/index.js'
 
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
