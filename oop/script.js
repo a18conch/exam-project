@@ -2,9 +2,12 @@ var gl;
 var displayWidth;
 var displayHeight;
 
-import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
-import { VisualObject } from '/visual-object.js'
-import { loadObj } from '/parse-obj.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
+import { VisualObject } from './visual-object.js'
+import { loadObj } from '../common/parse-obj.js'
+import { World } from '../common/oimo/Oimo.js'
+import { OOPTest } from '../common/test.js'
+import { viewPos, perspectiveProjection } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -21,13 +24,27 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let program = createProgram(gl, vertexShader, fragmentShader);
 
+  let world = new World({
+    timestep: 1 / 60,
+    iterations: 8,
+    broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
+    worldscale: 1, // scale full world 
+    random: true,  // randomize sample
+    info: false,   // calculate statistic or not
+    gravity: [0, -9.8, 0]
+  });
+  //floor 
+  let ground = world.add({ size: [50, 10, 50], pos: [0, -5, 0], density: 1 });
+
   let worldObjects = []
 
   let cache = new Map();
 
-  const renderData = await loadObj('/teapot.obj', cache, gl, program);
-  worldObjects.push(new VisualObject(vec3.fromValues(-15, 0, 0), quat.create(), renderData, vec3.fromValues(0, 1, 0)));
-  worldObjects.push(new VisualObject(vec3.fromValues(15, 0, 0), quat.create(), renderData, vec3.fromValues(1, 0, 0)));
+  const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
+
+  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world)
+  // createTeapot(worldObjects, world, -15, 10, 0, renderData);
+  // createTeapot(worldObjects, world, -12, 30, 0, renderData);
 
   //define the viewport
 
@@ -56,25 +73,33 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.clear(gl.GL_DEPTH_BUFFER_BIT);
+    //gl.clear(gl.GL_DEPTH_BUFFER_BIT);
 
     let view = mat4.create();
     let projection = mat4.create();
 
-    let viewPos = vec3.fromValues(0, 0, -40);
     view = mat4.translate(mat4.create(), view, viewPos);
-    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
+    projection = perspectiveProjection(displayWidth, displayHeight);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
+    world.step();
+
     worldObjects.forEach((obj, i, objects) => {
-      quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-      quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+      obj.position = vec3.fromValues(obj.collisionObject.getPosition().x, obj.collisionObject.getPosition().y, obj.collisionObject.getPosition().z);
+      obj.rotation = quat.fromValues(obj.collisionObject.getQuaternion().x, obj.collisionObject.getQuaternion().y, obj.collisionObject.getQuaternion().z, obj.collisionObject.getQuaternion().w);
       obj.draw(gl, program, viewPos);
     });
+
+    // worldObjects.forEach((obj, i, objects) => {
+    //   quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+    //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
+    //   obj.draw(gl, program, viewPos);
+    // });
   }
 }
+
 function createShader(gl, type, source) {
   var shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -127,7 +152,7 @@ function reportWindowSize() {
 window.onresize = reportWindowSize;
 window.onload = () => {
 
-  Promise.all([fetch("shader.vs"), fetch("shader.fs")]).then(([vertex, fragment]) => {
+  Promise.all([fetch("../common/shaders/shader.vs"), fetch("../common/shaders/shader.fs")]).then(([vertex, fragment]) => {
     if (!vertex.ok || !fragment.ok) {
       //throw new Error("HTTP error " + res.status)
     }

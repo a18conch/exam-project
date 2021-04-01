@@ -2,12 +2,13 @@ var gl;
 var displayWidth;
 var displayHeight;
 
-import { mat4, vec3, vec4, quat, glMatrix } from '/gl-matrix/index.js'
-import { VisualObject } from '/visual-object.js'
-import { loadObj } from '/parse-obj.js'
-import { TransformComponent } from '/components/transform-component.js'
-import { RenderComponent } from '/components/render-component.js'
+import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
+import { loadObj } from '../common/parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
+import { SpinSystem } from './systems/spin-system.js';
+import { World } from '../common/oimo/Oimo.js'
+import { DODTest } from '../common/test.js'
+import { viewPos, perspectiveProjection } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -24,29 +25,48 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let program = createProgram(gl, vertexShader, fragmentShader);
 
-  let worldObjects = []
   let systems = [];
   systems.push(new RenderSystem);
+  systems.push(new SpinSystem);
 
   let cache = new Map();
 
-  const renderData = await loadObj('/teapot.obj', cache, gl, program);
-  worldObjects.push(new VisualObject(vec3.fromValues(-15, 0, 0), quat.create(), renderData, vec3.fromValues(0, 1, 0)));
-  worldObjects.push(new VisualObject(vec3.fromValues(15, 0, 0), quat.create(), renderData, vec3.fromValues(1, 0, 0)));
+  let world = new World({
+    timestep: 1 / 60,
+    iterations: 8,
+    broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
+    worldscale: 1, // scale full world 
+    random: true,  // randomize sample
+    info: false,   // calculate statistic or not
+    gravity: [0, -9.8, 0]
+  });
+  //floor 
 
-  //define the viewport
-
-  let transformStorage = new TransformComponent();
-  let renderStorage = new RenderComponent();
+  //end floor
   let componentStorage = {}
-  componentStorage[transformStorage.constructor.name] = transformStorage;
-  componentStorage[renderStorage.constructor.name] = renderStorage;
+  componentStorage.x = [];
+  componentStorage.y = [];
+  componentStorage.z = [];
+  componentStorage.xRot = [];
+  componentStorage.yRot = [];
+  componentStorage.zRot = [];
+  componentStorage.wRot = [];
+  componentStorage.VAO = [];
+  componentStorage.indicesLength = [];
+  componentStorage.colorR = [];
+  componentStorage.colorG = [];
+  componentStorage.colorB = [];
+  componentStorage.collisionObject = [];
 
-  createEntity(componentStorage, { TransformComponent: { x: -15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
-  createEntity(componentStorage, { TransformComponent: { x: 15, y: 0, z: 0, xRot: 0, yRot: 0, zRot: 0 }, RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
-  createEntity(componentStorage, { RenderComponent: { VAO: renderData.VAO, indicesLength: renderData.indicesLength } });
+  const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
-  console.log(componentStorage);
+
+  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world);
+  //createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
+  //createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
+  //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
+
+  //viewport
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -62,12 +82,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let counter = 0;
 
   while (true) {
-    await new Promise(r => setTimeout(r, 5));
+    await new Promise(r => setTimeout(r, 1));
 
     counter++;
     if ((new Date).getTime() > time + 1000) {
       time = (new Date).getTime();
-      //console.log(counter);
+      console.log(counter);
       counter = 0;
     }
 
@@ -78,21 +98,14 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     let view = mat4.create();
     let projection = mat4.create();
 
-    let viewPos = vec3.fromValues(0, 0, -40);
     view = mat4.translate(mat4.create(), view, viewPos);
-    projection = mat4.perspective(mat4.create(), glMatrix.toRadian(45), displayWidth / displayHeight, 0.01, 100);
+    projection = perspectiveProjection(displayWidth, displayHeight);
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
-    // worldObjects.forEach((obj, i, objects) => {
-    //   quat.rotateX(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-    //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
-    //   obj.draw(gl, program, viewPos);
-    // });
-
     for (let system of systems) {
-      system.update(componentStorage, gl, program, viewPos);
+      system.update(componentStorage, gl, program, viewPos, world);
     }
   }
 }
@@ -101,9 +114,7 @@ function createEntity(componentStorage, components) {
   for (let componentName in componentStorage) {
     if (components[componentName] == null)
       continue;
-    for (let attributeName in componentStorage[componentName]) {
-      componentStorage[componentName][attributeName].push(components[componentName][attributeName])
-    }
+    componentStorage[componentName].push(components[componentName]);
   }
 }
 
@@ -159,7 +170,7 @@ function reportWindowSize() {
 window.onresize = reportWindowSize;
 window.onload = () => {
 
-  Promise.all([fetch("shader.vs"), fetch("shader.fs")]).then(([vertex, fragment]) => {
+  Promise.all([fetch("../common/shaders/shader.vs"), fetch("../common/shaders/shader.fs")]).then(([vertex, fragment]) => {
     if (!vertex.ok || !fragment.ok) {
       //throw new Error("HTTP error " + res.status)
     }

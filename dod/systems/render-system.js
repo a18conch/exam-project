@@ -1,20 +1,19 @@
-import { TransformComponent } from "../components/transform-component.js";
-import { RenderComponent } from "../components/render-component.js";
 import { System } from './system.js'
-import { vec3, quat, mat4 } from '../gl-matrix/index.js'
+import { vec3, quat, mat4 } from '../../common/gl-matrix/index.js'
 
 class RenderSystem extends System {
     update(componentStorage, gl, program, viewPos) {
-        let types = [TransformComponent, RenderComponent];
-        this.iterateEntitiesOfTypes(types, componentStorage, gl, program, viewPos, this.drawObject);
+        //define what attributes the entity should have
+        let types = ['x', 'y', 'z', 'xRot', 'yRot', 'zRot', 'wRot', 'VAO', 'indicesLength', 'colorR', 'colorG', 'colorB'];
+        this.iterateEntitiesOfTypes(types, componentStorage, this.drawObject, gl, program, viewPos);
     }
 
-    drawObject(gl, program, viewPos, entity) {
+    drawObject(entity, gl, program, viewPos) {
         let model = mat4.create();
 
         mat4.fromRotationTranslation(model,
-            quat.fromEuler(quat.create(), entity.TransformComponent.xRot, entity.TransformComponent.yRot, entity.TransformComponent.zRot),
-            vec3.fromValues(entity.TransformComponent.x, entity.TransformComponent.y, entity.TransformComponent.z));
+            quat.fromValues(entity.xRot, entity.yRot, entity.zRot, entity.wRot),
+            vec3.fromValues(entity.x, entity.y, entity.z));
 
         //model = mat4.translate(mat4.create(), model, this.position);
 
@@ -24,15 +23,15 @@ class RenderSystem extends System {
 
 
         //this.color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
-        gl.uniform3fv(gl.getUniformLocation(program, "color"), vec3.fromValues(0.5, 0.5, 0.5));
+        gl.uniform3fv(gl.getUniformLocation(program, "color"), vec3.fromValues(entity.colorR, entity.colorG, entity.colorB));
         gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
-        gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
+        gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(20, 20, 0));
         gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
-        gl.bindVertexArray(entity.RenderComponent.VAO);
+        gl.bindVertexArray(entity.VAO);
 
         //gl.drawArrays(primitiveType, offset, count);
-        gl.drawElements(gl.TRIANGLES, entity.RenderComponent.indicesLength, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, entity.indicesLength, gl.UNSIGNED_SHORT, 0);
     }
 }
 
