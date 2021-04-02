@@ -61,7 +61,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
 
-  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world);
+  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world, gl, program);
   //createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
   //createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
   //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });

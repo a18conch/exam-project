@@ -42,7 +42,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
-  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world)
+  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world, gl, program)
   // createTeapot(worldObjects, world, -15, 10, 0, renderData);
   // createTeapot(worldObjects, world, -12, 30, 0, renderData);
 
