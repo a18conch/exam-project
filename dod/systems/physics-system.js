@@ -1,6 +1,6 @@
 import { System } from './system.js'
 
-class SpinSystem extends System {
+class PhysicsSystem extends System {
     update(componentStorage, gl, program, viewPos, world) {
 
         //update world physics
@@ -33,4 +33,4 @@ class SpinSystem extends System {
     }
 }
 
-export { SpinSystem };
+export { PhysicsSystem as SpinSystem };

@@ -5,7 +5,7 @@ var displayHeight;
 import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 import { loadObj } from '../common/parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
-import { SpinSystem } from './systems/spin-system.js';
+import { SpinSystem } from './systems/physics-system.js';
 import { World } from '../common/oimo/Oimo.js'
 import { DODTest } from '../common/test.js'
 import { viewPos, perspectiveProjection } from '../common/constants.js';
