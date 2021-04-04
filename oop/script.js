@@ -33,8 +33,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     info: false,   // calculate statistic or not
     gravity: [0, -9.8, 0]
   });
-  //floor 
-  let ground = world.add({ size: [50, 10, 50], pos: [0, -5, 0], density: 1 });
+  //floor
 
   let worldObjects = []
 

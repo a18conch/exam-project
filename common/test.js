@@ -3,7 +3,7 @@ import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
 
 const X_AMOUNT = 10;
-const Y_AMOUNT = 10;
+const Z_AMOUNT = 10;
 const SPACE_BETWEEN = 15;
 const Y_LEVEL = 10;
 const FLOOR_WIDTH = 1000;
@@ -43,12 +43,15 @@ function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
 function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pass2) {
     Math.seedrandom('0');
 
+
     for (let i = 0; i < X_AMOUNT; i++) {
-        for (let j = 0; j < Y_AMOUNT; j++) {
+        for (let j = 0; j < Z_AMOUNT; j++) {
+            let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * Z_AMOUNT) / 2);
+            let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * X_AMOUNT) / 2);
             createFunction(
-                i * SPACE_BETWEEN,
+                xPos,
                 Y_LEVEL * Math.random(),
-                j * SPACE_BETWEEN,
+                zPos,
                 0,
                 0,
                 0,
@@ -58,7 +61,7 @@ function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pas
                 0,
                 1,
                 0,
-                world.add({ type: 'sphere', size: [9], pos: [i * SPACE_BETWEEN, Y_LEVEL * Math.random(), j * SPACE_BETWEEN], move: true, world: world }),
+                world.add({ type: 'sphere', size: [9], pos: [xPos, Y_LEVEL * Math.random(), zPos], move: true, world: world }),
                 pass1,
                 pass2
             );
