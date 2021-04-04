@@ -104,7 +104,6 @@ function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, 
 }
 
 function floorVAO(gl, program, width, height, depth) {
-    console.log(height)
     let vertices = [
         -width / 2, height / 2, -depth / 2,
         width / 2, height / 2, -depth / 2,

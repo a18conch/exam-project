@@ -8,7 +8,7 @@ import { RenderSystem } from './systems/render-system.js';
 import { SpinSystem } from './systems/physics-system.js';
 import { World } from '../common/oimo/Oimo.js'
 import { DODTest } from '../common/test.js'
-import { viewPos, perspectiveProjection } from '../common/constants.js';
+import { viewPos, perspectiveProjection, testWorld } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
@@ -31,15 +31,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let cache = new Map();
 
-  let world = new World({
-    timestep: 1 / 60,
-    iterations: 8,
-    broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
-    worldscale: 1, // scale full world 
-    random: true,  // randomize sample
-    info: false,   // calculate statistic or not
-    gravity: [0, -9.8, 0]
-  });
+  let world = testWorld();
   //floor 
 
   //end floor
