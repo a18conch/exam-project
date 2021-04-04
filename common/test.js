@@ -1,6 +1,7 @@
 
 import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
+import { teapotRadius } from './constants.js'
 
 const X_AMOUNT = 10;
 const Z_AMOUNT = 10;
@@ -41,8 +42,6 @@ function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
 }
 
 function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pass2) {
-    Math.seedrandom('0');
-
 
     for (let i = 0; i < X_AMOUNT; i++) {
         for (let j = 0; j < Z_AMOUNT; j++) {
@@ -61,7 +60,7 @@ function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pas
                 0,
                 1,
                 0,
-                world.add({ type: 'sphere', size: [9], pos: [xPos, Y_LEVEL * Math.random(), zPos], move: true, world: world }),
+                world.add({ type: 'sphere', size: [teapotRadius], pos: [xPos, Y_LEVEL * Math.random(), zPos], move: true, world: world }),
                 pass1,
                 pass2
             );

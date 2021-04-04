@@ -1,4 +1,5 @@
 import { System } from './system.js'
+import { yNegativePos, resetPos } from '../../common/constants.js'
 
 class PhysicsSystem extends System {
     update(componentStorage, gl, program, viewPos, world) {
@@ -12,6 +13,11 @@ class PhysicsSystem extends System {
     }
 
     spinObject(entity, gl, program, viewPos, world) {
+
+        if (entity.y < yNegativePos) {
+            let pos = resetPos();
+            entity.collisionObject.resetPosition(pos[0], pos[1], pos[2]);
+        }
 
         entity.x = entity.collisionObject.getPosition().x;
         entity.y = entity.collisionObject.getPosition().y;

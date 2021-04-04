@@ -7,9 +7,11 @@ import { VisualObject } from './visual-object.js'
 import { loadObj } from '../common/parse-obj.js'
 import { World } from '../common/oimo/Oimo.js'
 import { OOPTest } from '../common/test.js'
-import { viewPos, perspectiveProjection, testWorld } from '../common/constants.js';
+import { viewPos, perspectiveProjection, testWorld, yNegativePos, resetPos } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
+
+  Math.seedrandom('0');
 
   //glMatrix.setMatrixArrayType(Array)
 
@@ -80,6 +82,10 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     worldObjects.forEach((obj, i, objects) => {
       obj.position = vec3.fromValues(obj.collisionObject.getPosition().x, obj.collisionObject.getPosition().y, obj.collisionObject.getPosition().z);
       obj.rotation = quat.fromValues(obj.collisionObject.getQuaternion().x, obj.collisionObject.getQuaternion().y, obj.collisionObject.getQuaternion().z, obj.collisionObject.getQuaternion().w);
+      if (obj.position[1] < yNegativePos) {
+        let pos = resetPos();
+        obj.collisionObject.resetPosition(pos[0], pos[1], pos[2]);
+      }
       obj.draw(gl, program, viewPos);
     });
 

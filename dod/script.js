@@ -12,6 +12,8 @@ import { viewPos, perspectiveProjection, testWorld } from '../common/constants.j
 
 async function main(vertexShaderSource, fragmentShaderSource) {
 
+  Math.seedrandom('0');
+
   //glMatrix.setMatrixArrayType(Array)
 
   const canvas = document.querySelector("#glCanvas");
