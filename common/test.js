@@ -3,8 +3,8 @@ import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
 import { teapotRadius } from './constants.js'
 
-const X_AMOUNT = 10;
-const Z_AMOUNT = 10;
+const X_AMOUNT = 50;
+const Z_AMOUNT = 50;
 const SPACE_BETWEEN = 15;
 const Y_LEVEL = 10;
 const FLOOR_WIDTH = 1000;
@@ -69,6 +69,8 @@ function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pas
 }
 
 function OOPTest(worldObjects, VAO, indicesLength, world, gl, program) {
+    name = "OOP";
+
     createAndInitFloor(world, gl, program, OOPCreateFunction, worldObjects);
 
     createTestObjects(OOPCreateFunction, VAO, indicesLength, world, worldObjects)
@@ -79,6 +81,8 @@ function OOPCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, 
 }
 
 function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, program) {
+    name = "DOD";
+
     createAndInitFloor(world, gl, program, DODCreateFunction, componentStorage, createEntity)
 
     createTestObjects(DODCreateFunction, VAO, indicesLength, world, componentStorage, createEntity);
@@ -174,4 +178,50 @@ function floorVAO(gl, program, width, height, depth) {
     return { VAO, indicesLength: indices.length };
 }
 
-export { OOPTest, DODTest };
+const SECTION_LENGTH = 10;
+const SECTIONS = [10];
+const TIME_TO_TEST = 10;
+
+function testInit() {
+    startTime = (new Date).getTime();
+    time = (new Date).getTime();
+    counter = 0;
+    recordedData = { x10: [], name }
+}
+
+function testUpdate() {
+
+    counter++;
+    if ((new Date).getTime() > time + 1000) {
+        time = (new Date).getTime();
+        recordedData.x10.push(counter);
+        counter = 0;
+    }
+    if ((new Date).getTime() > startTime + TIME_TO_TEST * 1000 && !hasDownloaded) {
+        download("data.json", JSON.stringify(recordedData));
+        hasDownloaded = true;
+    }
+}
+
+var name;
+var hasDownloaded = false;
+var startTime;
+var counter;
+var time;
+var recordedData;
+
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+export { OOPTest, DODTest, testUpdate, testInit };

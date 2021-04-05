@@ -6,7 +6,7 @@ import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 import { VisualObject } from './visual-object.js'
 import { loadObj } from '../common/parse-obj.js'
 import { World } from '../common/oimo/Oimo.js'
-import { OOPTest } from '../common/test.js'
+import { OOPTest, testInit, testUpdate } from '../common/test.js'
 import { viewPos, perspectiveProjection, testWorld, yNegativePos, resetPos } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
@@ -51,18 +51,20 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
 
-  let time = (new Date).getTime();
-  let counter = 0;
+  // let time = (new Date).getTime();
+  // let counter = 0;
+
+  testInit();
 
   while (true) {
-    await new Promise(r => setTimeout(r, 5));
+    await new Promise(r => setTimeout(r, 1));
 
-    counter++;
-    if ((new Date).getTime() > time + 1000) {
-      time = (new Date).getTime();
-      console.log(counter);
-      counter = 0;
-    }
+    // counter++;
+    // if ((new Date).getTime() > time + 1000) {
+    //   time = (new Date).getTime();
+    //   console.log(counter);
+    //   counter = 0;
+    // }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
@@ -94,6 +96,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
     //   obj.draw(gl, program, viewPos);
     // });
+    testUpdate();
   }
 }
 

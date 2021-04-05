@@ -7,7 +7,7 @@ import { loadObj } from '../common/parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
 import { SpinSystem } from './systems/physics-system.js';
 import { World } from '../common/oimo/Oimo.js'
-import { DODTest } from '../common/test.js'
+import { DODTest, testInit, testUpdate } from '../common/test.js'
 import { viewPos, perspectiveProjection, testWorld } from '../common/constants.js';
 
 async function main(vertexShaderSource, fragmentShaderSource) {
@@ -28,13 +28,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let program = createProgram(gl, vertexShader, fragmentShader);
 
   let systems = [];
-  systems.push(new RenderSystem);
-  systems.push(new SpinSystem);
+  systems.push(new RenderSystem());
+  systems.push(new SpinSystem());
 
   let cache = new Map();
 
   let world = testWorld();
-  //floor 
 
   //end floor
   let componentStorage = {}
@@ -72,18 +71,20 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
 
-  let time = (new Date).getTime();
-  let counter = 0;
+  // let time = (new Date).getTime();
+  // let counter = 0;
+
+  testInit();
 
   while (true) {
     await new Promise(r => setTimeout(r, 1));
 
-    counter++;
-    if ((new Date).getTime() > time + 1000) {
-      time = (new Date).getTime();
-      console.log(counter);
-      counter = 0;
-    }
+    // counter++;
+    // if ((new Date).getTime() > time + 1000) {
+    //   time = (new Date).getTime();
+    //   console.log(counter);
+    //   counter = 0;
+    // }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
@@ -101,6 +102,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     for (let system of systems) {
       system.update(componentStorage, gl, program, viewPos, world);
     }
+    testUpdate();
   }
 }
 
