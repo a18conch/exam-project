@@ -3,8 +3,8 @@ import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
 import { teapotRadius } from './constants.js'
 
-const X_AMOUNT = 50;
-const Z_AMOUNT = 50;
+const X_AMOUNT = 10;
+const Z_AMOUNT = 10;
 const SPACE_BETWEEN = 15;
 const Y_LEVEL = 10;
 const FLOOR_WIDTH = 1000;
