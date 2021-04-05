@@ -13,7 +13,7 @@ class System {
                 }
                 entity[componentType] = attr;
             }
-            entity = iterateFunction(entity, gl, program, viewPos, world);
+            iterateFunction(entity, gl, program, viewPos, world);
             for (let attrName in entity) {
                 componentStorage[attrName][i] = entity[attrName];
             }

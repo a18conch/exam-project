@@ -54,8 +54,20 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   // let time = (new Date).getTime();
   // let counter = 0;
 
-  testInit();
+  let view = mat4.create();
+  let projection = mat4.create();
 
+  view = mat4.translate(mat4.create(), view, viewPos);
+  projection = perspectiveProjection(displayWidth, displayHeight);
+
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
+
+  gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
+  gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
+  gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
+
+  testInit();
   while (true) {
     await new Promise(r => setTimeout(r, 1));
 
@@ -69,15 +81,6 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
     //gl.clear(gl.GL_DEPTH_BUFFER_BIT);
-
-    let view = mat4.create();
-    let projection = mat4.create();
-
-    view = mat4.translate(mat4.create(), view, viewPos);
-    projection = perspectiveProjection(displayWidth, displayHeight);
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
     world.step();
 
