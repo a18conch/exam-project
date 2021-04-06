@@ -7,10 +7,10 @@ import { loadObj } from '../common/parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
 import { SpinSystem } from './systems/physics-system.js';
 import { World } from '../common/oimo/Oimo.js'
-import { DODTest, testInit, testUpdate } from '../common/test.js'
+import { DODTest, testInit, testUpdate, test } from '../common/test.js'
 import { viewPos, perspectiveProjection, testWorld } from '../common/constants.js';
 
-async function main(vertexShaderSource, fragmentShaderSource) {
+async function main(vertexShaderSource, fragmentShaderSource, section) {
 
   Math.seedrandom('0');
 
@@ -54,7 +54,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
 
-  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world, gl, program);
+  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world, gl, program, section);
+  console.log(section);
   //createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
   //createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
   //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
@@ -88,7 +89,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(20, 20, 0));
   gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
-  testInit();
+  testInit(section);
   while (true) {
     await new Promise(r => setTimeout(r, 1));
 
@@ -107,7 +108,10 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     for (let system of systems) {
       system.update(componentStorage, gl, program, viewPos, world);
     }
-    testUpdate();
+    if (testUpdate(section)) {
+      gl = null;
+      return;
+    }
   }
 }
 
@@ -177,6 +181,6 @@ window.onload = () => {
     }
     return Promise.all([vertex.text(), fragment.text()]);
   }).then(([vertex, fragment]) => {
-    main(vertex, fragment);
+    test(main, vertex, fragment, "DOD");
   })
 }

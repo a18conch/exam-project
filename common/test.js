@@ -1,10 +1,8 @@
 
 import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
-import { teapotRadius } from './constants.js'
+import { teapotRadius, testWorld } from './constants.js'
 
-const X_AMOUNT = 10;
-const Z_AMOUNT = 10;
 const SPACE_BETWEEN = 15;
 const Y_LEVEL = 10;
 const FLOOR_WIDTH = 1000;
@@ -41,12 +39,12 @@ function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
     // world.add({ size: [1000, 10, 1000], pos: [0, -5, 0], density: 1 });
 }
 
-function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pass2) {
+function createTestObjects(createFunction, VAO, indicesLength, world, amount, pass1, pass2) {
 
-    for (let i = 0; i < X_AMOUNT; i++) {
-        for (let j = 0; j < Z_AMOUNT; j++) {
-            let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * Z_AMOUNT) / 2);
-            let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * X_AMOUNT) / 2);
+    for (let i = 0; i < amount; i++) {
+        for (let j = 0; j < amount; j++) {
+            let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
+            let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
             createFunction(
                 xPos,
                 Y_LEVEL * Math.random(),
@@ -68,24 +66,22 @@ function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pas
     }
 }
 
-function OOPTest(worldObjects, VAO, indicesLength, world, gl, program) {
-    name = "OOP";
+function OOPTest(worldObjects, VAO, indicesLength, world, gl, program, amount) {
 
     createAndInitFloor(world, gl, program, OOPCreateFunction, worldObjects);
 
-    createTestObjects(OOPCreateFunction, VAO, indicesLength, world, worldObjects)
+    createTestObjects(OOPCreateFunction, VAO, indicesLength, world, amount, worldObjects)
 }
 
 function OOPCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, worldObjects) {
     worldObjects.push(new VisualObject(vec3.fromValues(x, y, z), quat.fromValues(xRot, yRot, zRot, wRot), { VAO, indicesLength }, collisionObject, vec3.fromValues(colorR, colorG, colorB)));
 }
 
-function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, program) {
-    name = "DOD";
+function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, program, amount) {
 
     createAndInitFloor(world, gl, program, DODCreateFunction, componentStorage, createEntity)
 
-    createTestObjects(DODCreateFunction, VAO, indicesLength, world, componentStorage, createEntity);
+    createTestObjects(DODCreateFunction, VAO, indicesLength, world, amount, componentStorage, createEntity);
 }
 
 function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, componentStorage, createEntity) {
@@ -179,37 +175,43 @@ function floorVAO(gl, program, width, height, depth) {
 }
 
 const SECTION_LENGTH = 10;
-const SECTIONS = [10];
+const SECTIONS = [10, 20, 30, 40, 50];
 const TIME_TO_TEST = 10;
 
-function testInit() {
+function testInit(section) {
     startTime = (new Date).getTime();
     time = (new Date).getTime();
     counter = 0;
-    recordedData = { x10: [], name }
+    recordedData[section] = [];
 }
 
-function testUpdate() {
+function testUpdate(section) {
 
     counter++;
     if ((new Date).getTime() > time + 1000) {
         time = (new Date).getTime();
-        recordedData.x10.push(counter);
+        recordedData[section].push(counter);
         counter = 0;
     }
-    if ((new Date).getTime() > startTime + TIME_TO_TEST * 1000 && !hasDownloaded) {
-        download("data.json", JSON.stringify(recordedData));
-        hasDownloaded = true;
+    if ((new Date).getTime() > startTime + TIME_TO_TEST * 1000) {
+        return true;
     }
+    return false;
 }
 
-var name;
-var hasDownloaded = false;
 var startTime;
 var counter;
 var time;
 var recordedData;
 
+async function test(testFunction, pass1, pass2, name) {
+    recordedData = { name }
+    for (const section of SECTIONS) {
+        await testFunction(pass1, pass2, section);
+    }
+
+    download(`data_${recordedData.name}.json`, JSON.stringify(recordedData));
+}
 
 function download(filename, text) {
     var element = document.createElement('a');
@@ -224,4 +226,4 @@ function download(filename, text) {
     document.body.removeChild(element);
 }
 
-export { OOPTest, DODTest, testUpdate, testInit };
+export { OOPTest, DODTest, testUpdate, testInit, test };

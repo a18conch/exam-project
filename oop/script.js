@@ -6,10 +6,10 @@ import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 import { VisualObject } from './visual-object.js'
 import { loadObj } from '../common/parse-obj.js'
 import { World } from '../common/oimo/Oimo.js'
-import { OOPTest, testInit, testUpdate } from '../common/test.js'
+import { OOPTest, testInit, testUpdate, test } from '../common/test.js'
 import { viewPos, perspectiveProjection, testWorld, yNegativePos, resetPos } from '../common/constants.js';
 
-async function main(vertexShaderSource, fragmentShaderSource) {
+async function main(vertexShaderSource, fragmentShaderSource, section) {
 
   Math.seedrandom('0');
 
@@ -35,7 +35,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
-  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world, gl, program)
+  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world, gl, program, section)
   // createTeapot(worldObjects, world, -15, 10, 0, renderData);
   // createTeapot(worldObjects, world, -12, 30, 0, renderData);
 
@@ -67,7 +67,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
   gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
-  testInit();
+  testInit(section);
   while (true) {
     await new Promise(r => setTimeout(r, 1));
 
@@ -99,7 +99,10 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
     //   obj.draw(gl, program, viewPos);
     // });
-    testUpdate();
+    if (testUpdate(section)) {
+      gl = null;
+      return;
+    }
   }
 }
 
@@ -161,6 +164,6 @@ window.onload = () => {
     }
     return Promise.all([vertex.text(), fragment.text()]);
   }).then(([vertex, fragment]) => {
-    main(vertex, fragment);
+    test(main, vertex, fragment, "OOP");
   })
 }
