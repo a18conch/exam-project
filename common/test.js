@@ -182,7 +182,8 @@ function testInit(section) {
     startTime = (new Date).getTime();
     time = (new Date).getTime();
     counter = 0;
-    recordedData[section] = [];
+    recordedData.push([]);
+    currentIndex = recordedData.length - 1;
 }
 
 function testUpdate(section) {
@@ -190,7 +191,7 @@ function testUpdate(section) {
     counter++;
     if ((new Date).getTime() > time + 1000) {
         time = (new Date).getTime();
-        recordedData[section].push(counter);
+        recordedData[currentIndex].push(counter);
         counter = 0;
     }
     if ((new Date).getTime() > startTime + TIME_TO_TEST * 1000) {
@@ -199,18 +200,19 @@ function testUpdate(section) {
     return false;
 }
 
+var currentIndex;
 var startTime;
 var counter;
 var time;
 var recordedData;
 
 async function test(testFunction, pass1, pass2, name) {
-    recordedData = { name }
+    recordedData = []
     for (const section of SECTIONS) {
         await testFunction(pass1, pass2, section);
     }
 
-    download(`data_${recordedData.name}.json`, JSON.stringify(recordedData));
+    download(`data_${name}.json`, JSON.stringify(recordedData));
 }
 
 function download(filename, text) {
