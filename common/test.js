@@ -175,7 +175,7 @@ function floorVAO(gl, program, width, height, depth) {
 }
 
 const SECTION_LENGTH = 10;
-const SECTIONS = [10, 20, 30, 40, 50];
+const SECTIONS = [1, 2, 3, 4, 5];
 const TIME_TO_TEST = 10;
 
 function testInit(section) {
@@ -209,7 +209,7 @@ var recordedData;
 async function test(testFunction, pass1, pass2, name) {
     recordedData = []
     for (const section of SECTIONS) {
-        await testFunction(pass1, pass2, section);
+        await testFunction(pass1, pass2, section * 10);
     }
 
     download(`data_${name}.json`, JSON.stringify(recordedData));
