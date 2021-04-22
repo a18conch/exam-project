@@ -6,10 +6,12 @@ import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 import { VisualObject } from './visual-object.js'
 import { loadObj } from '../common/parse-obj.js'
 import { World } from '../common/oimo/Oimo.js'
-import { OOPTest } from '../common/test.js'
-import { viewPos, perspectiveProjection } from '../common/constants.js';
+import { OOPTest, testInit, testUpdate, test } from '../common/test.js'
+import { viewPos, perspectiveProjection, testWorld, yNegativePos, resetPos } from '../common/constants.js';
 
-async function main(vertexShaderSource, fragmentShaderSource) {
+async function main(vertexShaderSource, fragmentShaderSource, section) {
+
+  Math.seedrandom('0');
 
   //glMatrix.setMatrixArrayType(Array)
 
@@ -24,17 +26,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   let program = createProgram(gl, vertexShader, fragmentShader);
 
-  let world = new World({
-    timestep: 1 / 60,
-    iterations: 8,
-    broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
-    worldscale: 1, // scale full world 
-    random: true,  // randomize sample
-    info: false,   // calculate statistic or not
-    gravity: [0, -9.8, 0]
-  });
-  //floor 
-  let ground = world.add({ size: [50, 10, 50], pos: [0, -5, 0], density: 1 });
+  let world = testWorld();
+  //floor
 
   let worldObjects = []
 
@@ -42,7 +35,7 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
-  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world)
+  OOPTest(worldObjects, renderData.VAO, renderData.indicesLength, world, gl, program, section)
   // createTeapot(worldObjects, world, -15, 10, 0, renderData);
   // createTeapot(worldObjects, world, -12, 30, 0, renderData);
 
@@ -58,37 +51,46 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
 
-  let time = (new Date).getTime();
-  let counter = 0;
+  // let time = (new Date).getTime();
+  // let counter = 0;
 
+  let view = mat4.create();
+  let projection = mat4.create();
+
+  view = mat4.translate(mat4.create(), view, viewPos);
+  projection = perspectiveProjection(displayWidth, displayHeight);
+
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
+
+  gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
+  gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
+  gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
+
+  testInit(section);
   while (true) {
-    await new Promise(r => setTimeout(r, 5));
+    await new Promise(r => setTimeout(r, 1));
 
-    counter++;
-    if ((new Date).getTime() > time + 1000) {
-      time = (new Date).getTime();
-      console.log(counter);
-      counter = 0;
-    }
+    // counter++;
+    // if ((new Date).getTime() > time + 1000) {
+    //   time = (new Date).getTime();
+    //   console.log(counter);
+    //   counter = 0;
+    // }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
     //gl.clear(gl.GL_DEPTH_BUFFER_BIT);
-
-    let view = mat4.create();
-    let projection = mat4.create();
-
-    view = mat4.translate(mat4.create(), view, viewPos);
-    projection = perspectiveProjection(displayWidth, displayHeight);
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
     world.step();
 
     worldObjects.forEach((obj, i, objects) => {
       obj.position = vec3.fromValues(obj.collisionObject.getPosition().x, obj.collisionObject.getPosition().y, obj.collisionObject.getPosition().z);
       obj.rotation = quat.fromValues(obj.collisionObject.getQuaternion().x, obj.collisionObject.getQuaternion().y, obj.collisionObject.getQuaternion().z, obj.collisionObject.getQuaternion().w);
+      if (obj.position[1] < yNegativePos) {
+        let pos = resetPos();
+        obj.collisionObject.resetPosition(pos[0], pos[1], pos[2]);
+      }
       obj.draw(gl, program, viewPos);
     });
 
@@ -97,6 +99,10 @@ async function main(vertexShaderSource, fragmentShaderSource) {
     //   quat.rotateZ(obj.rotation, obj.rotation, glMatrix.toRadian(-0.2));
     //   obj.draw(gl, program, viewPos);
     // });
+    if (testUpdate(section)) {
+      gl = null;
+      return;
+    }
   }
 }
 
@@ -158,6 +164,6 @@ window.onload = () => {
     }
     return Promise.all([vertex.text(), fragment.text()]);
   }).then(([vertex, fragment]) => {
-    main(vertex, fragment);
+    test(main, vertex, fragment, "OOP");
   })
 }

@@ -1,27 +1,54 @@
 
 import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
+import { teapotRadius, testWorld } from './constants.js'
 
-const X_AMOUNT = 10;
-const Y_AMOUNT = 10;
 const SPACE_BETWEEN = 15;
 const Y_LEVEL = 10;
+const FLOOR_WIDTH = 1000;
+const FLOOR_HEIGHT = 10;
+const FLOOR_DEPTH = 1000;
 
-function createFloor(world) {
-    return world.add({ size: [1000, 10, 1000], pos: [0, -5, 0], density: 1 });
+function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
+    let x = 0;
+    let y = -100;
+    let z = 0;
+    let width = FLOOR_WIDTH;
+    let height = FLOOR_HEIGHT;
+    let depth = FLOOR_DEPTH;
+
+    let renderData = floorVAO(gl, program, width, height, depth);
+
+    createFunction(
+        x,
+        y,
+        z,
+        0,
+        0,
+        0,
+        1,
+        renderData.VAO,
+        renderData.indicesLength,
+        0,
+        0,
+        0,
+        world.add({ size: [width, height, depth], pos: [x, y, z], density: 1 }),
+        pass1,
+        pass2
+    );
+    // world.add({ size: [1000, 10, 1000], pos: [0, -5, 0], density: 1 });
 }
 
-function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pass2) {
-    Math.seedrandom('0');
+function createTestObjects(createFunction, VAO, indicesLength, world, amount, pass1, pass2) {
 
-    createFloor(world);
-
-    for (let i = 0; i < X_AMOUNT; i++) {
-        for (let j = 0; j < Y_AMOUNT; j++) {
+    for (let i = 0; i < amount; i++) {
+        for (let j = 0; j < amount; j++) {
+            let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
+            let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
             createFunction(
-                i * SPACE_BETWEEN,
+                xPos,
                 Y_LEVEL * Math.random(),
-                j * SPACE_BETWEEN,
+                zPos,
                 0,
                 0,
                 0,
@@ -31,7 +58,7 @@ function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pas
                 0,
                 1,
                 0,
-                world.add({ type: 'sphere', size: [9], pos: [i * SPACE_BETWEEN, Y_LEVEL * Math.random(), j * SPACE_BETWEEN], move: true, world: world }),
+                world.add({ type: 'sphere', size: [teapotRadius], pos: [xPos, Y_LEVEL * Math.random(), zPos], move: true, world: world }),
                 pass1,
                 pass2
             );
@@ -39,16 +66,22 @@ function createTestObjects(createFunction, VAO, indicesLength, world, pass1, pas
     }
 }
 
-function OOPTest(worldObjects, VAO, indicesLength, world) {
-    createTestObjects(OOPCreateFunction, VAO, indicesLength, world, worldObjects)
+function OOPTest(worldObjects, VAO, indicesLength, world, gl, program, amount) {
+
+    createAndInitFloor(world, gl, program, OOPCreateFunction, worldObjects);
+
+    createTestObjects(OOPCreateFunction, VAO, indicesLength, world, amount, worldObjects)
 }
 
 function OOPCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, worldObjects) {
     worldObjects.push(new VisualObject(vec3.fromValues(x, y, z), quat.fromValues(xRot, yRot, zRot, wRot), { VAO, indicesLength }, collisionObject, vec3.fromValues(colorR, colorG, colorB)));
 }
 
-function DODTest(componentStorage, createEntity, VAO, indicesLength, world) {
-    createTestObjects(DODCreateFunction, VAO, indicesLength, world, componentStorage, createEntity);
+function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, program, amount) {
+
+    createAndInitFloor(world, gl, program, DODCreateFunction, componentStorage, createEntity)
+
+    createTestObjects(DODCreateFunction, VAO, indicesLength, world, amount, componentStorage, createEntity);
 }
 
 function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, componentStorage, createEntity) {
@@ -69,4 +102,130 @@ function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, 
     });
 }
 
-export { OOPTest, DODTest };
+function floorVAO(gl, program, width, height, depth) {
+    let vertices = [
+        -width / 2, height / 2, -depth / 2,
+        width / 2, height / 2, -depth / 2,
+        width / 2, height / 2, depth / 2,
+        -width / 2, height / 2, depth / 2,
+        -width / 2, -height / 2, -depth / 2,
+        width / 2, -height / 2, -depth / 2,
+        width / 2, -height / 2, depth / 2,
+        -width / 2, -height / 2, depth / 2,
+    ]
+    let normalVertices = [
+        0, 1, 0,
+        0, -0, 1,
+        -1, -0, 0,
+        0, -1, -0,
+        1, -0, 0,
+        0, 0, -1,
+    ]
+    let indices = [
+        0, 1, 2,
+        0, 3, 2,
+        0, 1, 4,
+        4, 1, 5,
+        1, 2, 6,
+        5, 1, 6,
+        0, 4, 7,
+        4, 0, 7,
+        3, 2, 7,
+        6, 7, 2,
+        4, 5, 6,
+        4, 7, 6,
+    ];
+
+    let positionLoc = gl.getAttribLocation(program, "aPosition");
+    let normalLoc = gl.getAttribLocation(program, "aNormal");
+
+    let VAO = gl.createVertexArray();
+    let VBO = gl.createBuffer(); //position buffer
+    let NVBO = gl.createBuffer(); //normal buffer
+    let EBO = gl.createBuffer();
+
+    gl.bindVertexArray(VAO);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, NVBO);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalVertices), gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+    // enable attributes
+    gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+    gl.enableVertexAttribArray(positionLoc)
+    gl.vertexAttribPointer(
+        positionLoc, 3, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, NVBO);
+    gl.enableVertexAttribArray(normalLoc)
+    gl.vertexAttribPointer(
+        normalLoc, 3, gl.FLOAT, false, 0, 0);
+
+    // Bind the position buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindVertexArray(null);
+
+    return { VAO, indicesLength: indices.length };
+}
+
+const SECTION_LENGTH = 10;
+const SECTIONS = [10, 20, 30, 40, 50];
+const TIME_TO_TEST = 10;
+
+function testInit(section) {
+    startTime = (new Date).getTime();
+    time = (new Date).getTime();
+    counter = 0;
+    recordedData.push([]);
+    currentIndex = recordedData.length - 1;
+}
+
+function testUpdate(section) {
+
+    counter++;
+    if ((new Date).getTime() > time + 1000) {
+        time = (new Date).getTime();
+        recordedData[currentIndex].push(counter);
+        counter = 0;
+    }
+    if ((new Date).getTime() > startTime + TIME_TO_TEST * 1000) {
+        return true;
+    }
+    return false;
+}
+
+var currentIndex;
+var startTime;
+var counter;
+var time;
+var recordedData;
+
+async function test(testFunction, pass1, pass2, name) {
+    recordedData = []
+    for (const section of SECTIONS) {
+        await testFunction(pass1, pass2, section);
+    }
+
+    download(`data_${name}.json`, JSON.stringify(recordedData));
+}
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+export { OOPTest, DODTest, testUpdate, testInit, test };

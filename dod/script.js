@@ -5,12 +5,14 @@ var displayHeight;
 import { mat4, vec3, vec4, quat, glMatrix } from '../common/gl-matrix/index.js'
 import { loadObj } from '../common/parse-obj.js'
 import { RenderSystem } from './systems/render-system.js';
-import { SpinSystem } from './systems/spin-system.js';
+import { SpinSystem } from './systems/physics-system.js';
 import { World } from '../common/oimo/Oimo.js'
-import { DODTest } from '../common/test.js'
-import { viewPos, perspectiveProjection } from '../common/constants.js';
+import { DODTest, testInit, testUpdate, test } from '../common/test.js'
+import { viewPos, perspectiveProjection, testWorld } from '../common/constants.js';
 
-async function main(vertexShaderSource, fragmentShaderSource) {
+async function main(vertexShaderSource, fragmentShaderSource, section) {
+
+  Math.seedrandom('0');
 
   //glMatrix.setMatrixArrayType(Array)
 
@@ -26,21 +28,12 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   let program = createProgram(gl, vertexShader, fragmentShader);
 
   let systems = [];
-  systems.push(new RenderSystem);
-  systems.push(new SpinSystem);
+  systems.push(new RenderSystem());
+  systems.push(new SpinSystem());
 
   let cache = new Map();
 
-  let world = new World({
-    timestep: 1 / 60,
-    iterations: 8,
-    broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
-    worldscale: 1, // scale full world 
-    random: true,  // randomize sample
-    info: false,   // calculate statistic or not
-    gravity: [0, -9.8, 0]
-  });
-  //floor 
+  let world = testWorld();
 
   //end floor
   let componentStorage = {}
@@ -61,7 +54,8 @@ async function main(vertexShaderSource, fragmentShaderSource) {
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
 
-  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world);
+  DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world, gl, program, section);
+  console.log(section);
   //createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
   //createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
   //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
@@ -78,34 +72,45 @@ async function main(vertexShaderSource, fragmentShaderSource) {
 
   //gl.enableVertexAttribArray(positionAttributeLocation);
 
-  let time = (new Date).getTime();
-  let counter = 0;
+  // let time = (new Date).getTime();
+  // let counter = 0;
 
+  let view = mat4.create();
+  let projection = mat4.create();
+
+  view = mat4.translate(mat4.create(), view, viewPos);
+  projection = perspectiveProjection(displayWidth, displayHeight);
+
+
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
+  gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
+
+  gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
+  gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(20, 20, 0));
+  gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
+
+  testInit(section);
   while (true) {
     await new Promise(r => setTimeout(r, 1));
 
-    counter++;
-    if ((new Date).getTime() > time + 1000) {
-      time = (new Date).getTime();
-      console.log(counter);
-      counter = 0;
-    }
+    // counter++;
+    // if ((new Date).getTime() > time + 1000) {
+    //   time = (new Date).getTime();
+    //   console.log(counter);
+    //   counter = 0;
+    // }
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
     //gl.clear(gl.GL_DEPTH_BUFFER_BIT);
 
-    let view = mat4.create();
-    let projection = mat4.create();
-
-    view = mat4.translate(mat4.create(), view, viewPos);
-    projection = perspectiveProjection(displayWidth, displayHeight);
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, projection);
 
     for (let system of systems) {
       system.update(componentStorage, gl, program, viewPos, world);
+    }
+    if (testUpdate(section)) {
+      gl = null;
+      return;
     }
   }
 }
@@ -176,6 +181,6 @@ window.onload = () => {
     }
     return Promise.all([vertex.text(), fragment.text()]);
   }).then(([vertex, fragment]) => {
-    main(vertex, fragment);
+    test(main, vertex, fragment, "DOD");
   })
 }

@@ -22,12 +22,8 @@ class VisualObject extends WorldObject {
 
         gl.uniformMatrix4fv(gl.getUniformLocation(program, "model"), false, model);
 
-
         //this.color = (Math.sin((new Date).getTime() / 1000) / 2.0) + 0.5;
         gl.uniform3fv(gl.getUniformLocation(program, "color"), this.color);
-        gl.uniform3fv(gl.getUniformLocation(program, "lightColor"), vec3.fromValues(1, 1, 1));
-        gl.uniform3fv(gl.getUniformLocation(program, "lightPos"), vec3.fromValues(0, 0, 0));
-        gl.uniform3fv(gl.getUniformLocation(program, "viewPos"), viewPos);
 
         gl.bindVertexArray(this.renderData.VAO);
 
