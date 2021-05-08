@@ -91,7 +91,7 @@ async function main(vertexShaderSource, fragmentShaderSource, section) {
         let pos = resetPos();
         obj.collisionObject.resetPosition(pos[0], pos[1], pos[2]);
       }
-      obj.draw(gl, program, viewPos);
+      obj.draw(gl, program);
     });
 
     // worldObjects.forEach((obj, i, objects) => {

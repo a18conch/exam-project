@@ -39,13 +39,15 @@ function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
     // world.add({ size: [1000, 10, 1000], pos: [0, -5, 0], density: 1 });
 }
 
-function createTestObjects(createFunction, VAO, indicesLength, world, amount, pass1, pass2) {
+function createTestObjects(createFunction, createChildFunction, VAO, indicesLength, world, amount, pass1, pass2) {
 
     for (let i = 0; i < amount; i++) {
         for (let j = 0; j < amount; j++) {
             let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
             let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
-            createFunction(
+            let randomPos = Y_LEVEL * Math.random();
+
+            let index = createFunction(
                 xPos,
                 Y_LEVEL * Math.random(),
                 zPos,
@@ -58,7 +60,26 @@ function createTestObjects(createFunction, VAO, indicesLength, world, amount, pa
                 0,
                 1,
                 0,
-                world.add({ type: 'sphere', size: [teapotRadius], pos: [xPos, Y_LEVEL * Math.random(), zPos], move: true, world: world }),
+                world.add({ type: ['sphere', 'sphere'], size: [teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0, 0, 10, 0], move: true, world: world }),
+                //world.add({ type: ['sphere'], size: [teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0], move: true, world: world }),
+                pass1,
+                pass2
+            );
+
+            createChildFunction(
+                0,
+                10,
+                0,
+                0,
+                0,
+                0,
+                1,
+                VAO,
+                indicesLength,
+                0,
+                1,
+                0,
+                index,
                 pass1,
                 pass2
             );
@@ -70,20 +91,28 @@ function OOPTest(worldObjects, VAO, indicesLength, world, gl, program, amount) {
 
     createAndInitFloor(world, gl, program, OOPCreateFunction, worldObjects);
 
-    createTestObjects(OOPCreateFunction, VAO, indicesLength, world, amount, worldObjects)
+    createTestObjects(OOPCreateFunction, OOPCreateChildFunction, VAO, indicesLength, world, amount, worldObjects)
+}
+
+function OOPCreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, parentIndex, worldObjects) {
+    worldObjects[parentIndex].addChild(
+        new VisualObject(vec3.fromValues(x, y, z), quat.fromValues(xRot, yRot, zRot, wRot), { VAO, indicesLength }, null, vec3.fromValues(colorR, colorG, colorB))
+    );
 }
 
 function OOPCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, worldObjects) {
     worldObjects.push(new VisualObject(vec3.fromValues(x, y, z), quat.fromValues(xRot, yRot, zRot, wRot), { VAO, indicesLength }, collisionObject, vec3.fromValues(colorR, colorG, colorB)));
+    return worldObjects.length - 1;
 }
 
 function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, program, amount) {
 
     createAndInitFloor(world, gl, program, DODCreateFunction, componentStorage, createEntity)
 
-    createTestObjects(DODCreateFunction, VAO, indicesLength, world, amount, componentStorage, createEntity);
+    createTestObjects(DODCreateFunction, DODCreateChildFunction, VAO, indicesLength, world, amount, componentStorage, createEntity);
 }
 
+//don't forget to return index
 function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, componentStorage, createEntity) {
     createEntity(componentStorage, {
         x: x,

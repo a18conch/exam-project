@@ -9,12 +9,19 @@ class VisualObject extends WorldObject {
         this.collisionObject = collisionObject;
 
         this.color = color;
+        this.children = [];
     }
 
-    draw(gl, program, viewPos) {
-        let model = mat4.create();
+    draw(gl, program, parentPos, parentRot) {
 
-        mat4.fromRotationTranslation(model, this.rotation, this.position);
+        let model;
+        if (parentPos && parentRot) {
+            model = mat4.fromRotationTranslation(mat4.create(), parentRot, parentPos);
+            mat4.multiply(model, model, mat4.fromRotationTranslation(mat4.create(), this.rotation, this.position));
+        }
+        else
+            model = mat4.fromRotationTranslation(mat4.create(), this.rotation, this.position);
+
 
         //model = mat4.translate(mat4.create(), model, this.position);
 
@@ -29,6 +36,14 @@ class VisualObject extends WorldObject {
 
         //gl.drawArrays(primitiveType, offset, count);
         gl.drawElements(gl.TRIANGLES, this.renderData.indicesLength, gl.UNSIGNED_SHORT, 0);
+
+        for (let child of this.children) {
+            child.draw(gl, program, this.position, this.rotation);
+        }
+    }
+
+    addChild(child) {
+        this.children.push(child);
     }
 }
 
