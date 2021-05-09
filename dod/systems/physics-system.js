@@ -12,7 +12,7 @@ class PhysicsSystem extends System {
         this.iterateEntitiesOfTypes(types, componentStorage, this.spinObject, gl, program, viewPos, world);
     }
 
-    spinObject(entity, gl, program, viewPos, world) {
+    spinObject(entity) {
 
         if (entity.y < yNegativePos) {
             let pos = resetPos();

@@ -50,12 +50,13 @@ async function main(vertexShaderSource, fragmentShaderSource, section) {
   componentStorage.colorG = [];
   componentStorage.colorB = [];
   componentStorage.collisionObject = [];
+  componentStorage.parentIndex = [];
 
   const renderData = await loadObj('../common/models/teapot.obj', cache, gl, program);
 
 
   DODTest(componentStorage, createEntity, renderData.VAO, renderData.indicesLength, world, gl, program, section);
-  console.log(section);
+
   //createTeapot(componentStorage, world, -15, 10, 0, renderData.VAO, renderData.indicesLength);
   //createTeapot(componentStorage, world, -12, 30, 0, renderData.VAO, renderData.indicesLength);
   //createEntity(componentStorage, { VAO: renderData.VAO, indicesLength: renderData.indicesLength });
@@ -117,8 +118,8 @@ async function main(vertexShaderSource, fragmentShaderSource, section) {
 
 function createEntity(componentStorage, components) {
   for (let componentName in componentStorage) {
-    if (components[componentName] == null)
-      continue;
+    //if (components[componentName] == null)
+    //  continue;
     componentStorage[componentName].push(components[componentName]);
   }
 }

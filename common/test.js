@@ -112,6 +112,24 @@ function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, 
     createTestObjects(DODCreateFunction, DODCreateChildFunction, VAO, indicesLength, world, amount, componentStorage, createEntity);
 }
 
+function DODCreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, parentIndex, componentStorage, createEntity) {
+    createEntity(componentStorage, {
+        x: x,
+        y: y,
+        z: z,
+        xRot: xRot,
+        yRot: yRot,
+        zRot: zRot,
+        wRot: wRot,
+        VAO: VAO,
+        indicesLength: indicesLength,
+        colorR: colorR,
+        colorG: colorG,
+        colorB: colorB,
+        parentIndex: parentIndex
+    });
+}
+
 //don't forget to return index
 function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, componentStorage, createEntity) {
     createEntity(componentStorage, {
@@ -127,8 +145,12 @@ function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, 
         colorR: colorR,
         colorG: colorG,
         colorB: colorB,
-        collisionObject: collisionObject
+        collisionObject: collisionObject,
+        parentIndex: null,
     });
+    for (var attribute in componentStorage) {
+        return componentStorage[attribute].length - 1;
+    }
 }
 
 function floorVAO(gl, program, width, height, depth) {
