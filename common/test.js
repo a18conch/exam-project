@@ -9,6 +9,12 @@ const FLOOR_WIDTH = 1000;
 const FLOOR_HEIGHT = 10;
 const FLOOR_DEPTH = 1000;
 
+const SECTION_AMOUNT = 150;
+
+function calculateEntityCount(x) {
+    return 10 * Math.pow(Math.E, 0.04 * x)
+}
+
 function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
     let x = 0;
     let y = -100;
@@ -41,10 +47,15 @@ function createAndInitFloor(world, gl, program, createFunction, pass1, pass2) {
 
 function createTestObjects(createFunction, createChildFunction, VAO, indicesLength, world, amount, pass1, pass2) {
 
-    for (let i = 0; i < amount; i++) {
-        for (let j = 0; j < amount; j++) {
-            let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
-            let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * amount) / 2);
+    let upper = Math.round(Math.sqrt(amount));
+    let lower = Math.floor(Math.sqrt(amount));
+
+    let rest = amount - upper * lower;
+
+    for (let i = 0; i < upper; i++) {
+        for (let j = 0; j < lower; j++) {
+            let zPos = j * SPACE_BETWEEN - ((SPACE_BETWEEN * lower) / 2);
+            let xPos = i * SPACE_BETWEEN - ((SPACE_BETWEEN * upper) / 2);
             let randomPos = Y_LEVEL * Math.random();
 
             let index = createFunction(
@@ -84,6 +95,52 @@ function createTestObjects(createFunction, createChildFunction, VAO, indicesLeng
                 pass2
             );
         }
+    }
+
+    if (rest <= 0)
+        return;
+
+    for (let i = 0; i < rest; i++) {
+        let zPos = lower * SPACE_BETWEEN - ((SPACE_BETWEEN * lower) / 2);
+        let xPos = (i + upper) * SPACE_BETWEEN - ((SPACE_BETWEEN * upper) / 2);
+        let randomPos = Y_LEVEL * Math.random();
+
+        let index = createFunction(
+            xPos,
+            Y_LEVEL * Math.random(),
+            zPos,
+            0,
+            0,
+            0,
+            1,
+            VAO,
+            indicesLength,
+            0,
+            1,
+            0,
+            world.add({ type: ['sphere', 'sphere'], size: [teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0, 0, 10, 0], move: true, world: world }),
+            //world.add({ type: ['sphere'], size: [teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0], move: true, world: world }),
+            pass1,
+            pass2
+        );
+
+        createChildFunction(
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            1,
+            VAO,
+            indicesLength,
+            0,
+            1,
+            0,
+            index,
+            pass1,
+            pass2
+        );
     }
 }
 
@@ -226,7 +283,7 @@ function floorVAO(gl, program, width, height, depth) {
 }
 
 const SECTION_LENGTH = 10;
-const SECTIONS = [1, 2, 3, 4, 5];
+const SECTIONS = [...Array(SECTION_AMOUNT).keys()];
 const TIME_TO_TEST = 10;
 
 function testInit(section) {
@@ -260,7 +317,7 @@ var recordedData;
 async function test(testFunction, pass1, pass2, name) {
     recordedData = []
     for (const section of SECTIONS) {
-        await testFunction(pass1, pass2, section * 10);
+        await testFunction(pass1, pass2, Math.round(calculateEntityCount(section + 1)));
     }
 
     download(`data_${name}.json`, JSON.stringify(recordedData));
