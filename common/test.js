@@ -2,6 +2,7 @@
 import { VisualObject } from '../oop/visual-object.js'
 import { quat, vec3 } from './gl-matrix/index.js';
 import { teapotRadius, testWorld } from './constants.js'
+import { Transform, Render, Collision } from '../dod2/components/allComponents.js'
 
 const SPACE_BETWEEN = 15;
 const Y_LEVEL = 10;
@@ -210,6 +211,30 @@ function DODCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, 
     }
 }
 
+function DOD2Test(componentStorage, VAO, indicesLength, world, gl, program, amount) {
+
+    createAndInitFloor(world, gl, program, DOD2CreateFunction, componentStorage)
+
+    createTestObjects(DOD2CreateFunction, DOD2CreateChildFunction, VAO, indicesLength, world, amount, componentStorage);
+}
+
+function DOD2CreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, parentEntity, ecsWorld) {
+    ecsWorld.createEntity()
+        .addComponent(Transform, { x, y, z, xRot, yRot, zRot, wRot, parent: parentEntity })
+        .addComponent(Render, { VAO, indicesLength, colorR, colorG, colorB });
+}
+
+function DOD2CreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, ecsWorld) {
+
+    let transform = { x, y, z, xRot, yRot, zRot, wRot, parent: null }
+    return (ecsWorld.createEntity()
+        .addComponent(Transform, transform)
+        .addComponent(Render, { VAO, indicesLength, colorR, colorG, colorB })
+        .addComponent(Collision, { collisionObject }));
+
+    return transform;
+}
+
 function floorVAO(gl, program, width, height, depth) {
     let vertices = [
         -width / 2, height / 2, -depth / 2,
@@ -336,4 +361,4 @@ function download(filename, text) {
     document.body.removeChild(element);
 }
 
-export { OOPTest, DODTest, testUpdate, testInit, test };
+export { OOPTest, DODTest, DOD2Test, testUpdate, testInit, test };
