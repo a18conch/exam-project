@@ -103,7 +103,7 @@ async function main(vertexShaderSource, fragmentShaderSource, section) {
 
         if (transform.y < yNegativePos) {
           let pos = resetPos();
-          collision.resetPosition(pos[0], pos[1], pos[2]);
+          collision.collisionObject.resetPosition(pos[0], pos[1], pos[2]);
         }
 
         transform.x = collision.collisionObject.getPosition().x;
@@ -252,6 +252,6 @@ window.onload = () => {
     }
     return Promise.all([vertex.text(), fragment.text()]);
   }).then(([vertex, fragment]) => {
-    test(main, vertex, fragment, "DOD");
+    test(main, vertex, fragment, "DOD2");
   })
 }

@@ -315,8 +315,8 @@ function testInit(section) {
     startTime = (new Date).getTime();
     time = (new Date).getTime();
     counter = 0;
-    recordedData.push([]);
-    currentIndex = recordedData.length - 1;
+    recordedData[section.toString()] = [];
+    currentIndex = section;
 }
 
 function testUpdate(section) {
@@ -340,7 +340,7 @@ var time;
 var recordedData;
 
 async function test(testFunction, pass1, pass2, name) {
-    recordedData = []
+    recordedData = {}
     for (const section of SECTIONS) {
         await testFunction(pass1, pass2, Math.round(calculateEntityCount(section + 1)));
     }
