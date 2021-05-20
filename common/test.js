@@ -312,7 +312,7 @@ const SECTIONS = [...Array(SECTION_AMOUNT).keys()];
 const TIME_TO_TEST = 10;
 
 function testInit(section) {
-    startTime = (new Date).getTime();
+    sectionCounter = 0;
     time = (new Date).getTime();
     counter = 0;
     recordedData[section.toString()] = [];
@@ -326,15 +326,16 @@ function testUpdate(section) {
         time = (new Date).getTime();
         recordedData[currentIndex].push(counter);
         counter = 0;
-    }
-    if ((new Date).getTime() > startTime + TIME_TO_TEST * 1000) {
-        return true;
+        sectionCounter++;
+        if (sectionCounter >= TIME_TO_TEST) {
+            return true;
+        }
     }
     return false;
 }
 
 var currentIndex;
-var startTime;
+var sectionCounter;
 var counter;
 var time;
 var recordedData;
