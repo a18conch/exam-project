@@ -72,8 +72,44 @@ function createTestObjects(createFunction, createChildFunction, VAO, indicesLeng
                 0,
                 1,
                 0,
-                world.add({ type: ['sphere', 'sphere'], size: [teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0, 0, 10, 0], move: true, world: world }),
+                world.add({ type: ['sphere', 'sphere', 'sphere', 'sphere'], size: [teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0, 0, 10, 0, 0, 20, 0, 0, 30, 0], move: true, world: world }),
                 //world.add({ type: ['sphere'], size: [teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0], move: true, world: world }),
+                pass1,
+                pass2
+            );
+
+            let child2 = createChildFunction(
+                0,
+                10,
+                0,
+                0,
+                0,
+                0,
+                1,
+                VAO,
+                indicesLength,
+                0,
+                1,
+                0,
+                index,
+                pass1,
+                pass2
+            );
+
+            let child3 = createChildFunction(
+                0,
+                10,
+                0,
+                0,
+                0,
+                0,
+                1,
+                VAO,
+                indicesLength,
+                0,
+                1,
+                0,
+                child2,
                 pass1,
                 pass2
             );
@@ -91,7 +127,7 @@ function createTestObjects(createFunction, createChildFunction, VAO, indicesLeng
                 0,
                 1,
                 0,
-                index,
+                child3,
                 pass1,
                 pass2
             );
@@ -119,8 +155,44 @@ function createTestObjects(createFunction, createChildFunction, VAO, indicesLeng
             0,
             1,
             0,
-            world.add({ type: ['sphere', 'sphere'], size: [teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0, 0, 10, 0], move: true, world: world }),
+            world.add({ type: ['sphere', 'sphere', 'sphere', 'sphere'], size: [teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius, teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0, 0, 10, 0, 0, 20, 0, 0, 30, 0], move: true, world: world }),
             //world.add({ type: ['sphere'], size: [teapotRadius], pos: [xPos, randomPos, zPos], posShape: [0, 0, 0], move: true, world: world }),
+            pass1,
+            pass2
+        );
+
+        let child2 = createChildFunction(
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            1,
+            VAO,
+            indicesLength,
+            0,
+            1,
+            0,
+            index,
+            pass1,
+            pass2
+        );
+
+        let child3 = createChildFunction(
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            1,
+            VAO,
+            indicesLength,
+            0,
+            1,
+            0,
+            child2,
             pass1,
             pass2
         );
@@ -138,7 +210,7 @@ function createTestObjects(createFunction, createChildFunction, VAO, indicesLeng
             0,
             1,
             0,
-            index,
+            child3,
             pass1,
             pass2
         );
@@ -152,15 +224,16 @@ function OOPTest(worldObjects, VAO, indicesLength, world, gl, program, amount) {
     createTestObjects(OOPCreateFunction, OOPCreateChildFunction, VAO, indicesLength, world, amount, worldObjects)
 }
 
-function OOPCreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, parentIndex, worldObjects) {
-    worldObjects[parentIndex].addChild(
+function OOPCreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, parent, worldObjects) {
+    parent.addChild(
         new VisualObject(vec3.fromValues(x, y, z), quat.fromValues(xRot, yRot, zRot, wRot), { VAO, indicesLength }, null, vec3.fromValues(colorR, colorG, colorB))
     );
+    return parent.children[parent.children.length - 1];
 }
 
 function OOPCreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, worldObjects) {
     worldObjects.push(new VisualObject(vec3.fromValues(x, y, z), quat.fromValues(xRot, yRot, zRot, wRot), { VAO, indicesLength }, collisionObject, vec3.fromValues(colorR, colorG, colorB)));
-    return worldObjects.length - 1;
+    return worldObjects[worldObjects.length - 1];
 }
 
 function DODTest(componentStorage, createEntity, VAO, indicesLength, world, gl, program, amount) {
@@ -186,6 +259,9 @@ function DODCreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLen
         colorB: colorB,
         parentIndex: parentIndex
     });
+    for (var attribute in componentStorage) {
+        return componentStorage[attribute].length - 1;
+    }
 }
 
 //don't forget to return index
@@ -219,9 +295,9 @@ function DOD2Test(componentStorage, VAO, indicesLength, world, gl, program, amou
 }
 
 function DOD2CreateChildFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, parentEntity, ecsWorld) {
-    ecsWorld.createEntity()
+    return (ecsWorld.createEntity()
         .addComponent(Transform, { x, y, z, xRot, yRot, zRot, wRot, parent: parentEntity })
-        .addComponent(Render, { VAO, indicesLength, colorR, colorG, colorB });
+        .addComponent(Render, { VAO, indicesLength, colorR, colorG, colorB }));
 }
 
 function DOD2CreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength, colorR, colorG, colorB, collisionObject, ecsWorld) {
@@ -231,8 +307,6 @@ function DOD2CreateFunction(x, y, z, xRot, yRot, zRot, wRot, VAO, indicesLength,
         .addComponent(Transform, transform)
         .addComponent(Render, { VAO, indicesLength, colorR, colorG, colorB })
         .addComponent(Collision, { collisionObject }));
-
-    return transform;
 }
 
 function floorVAO(gl, program, width, height, depth) {

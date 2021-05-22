@@ -15,7 +15,7 @@ class RenderSystem extends System {
                 quat.fromValues(componentStorage.xRot[parentIndex], componentStorage.yRot[parentIndex], componentStorage.zRot[parentIndex], componentStorage.wRot[parentIndex]),
                 vec3.fromValues(componentStorage.x[parentIndex], componentStorage.y[parentIndex], componentStorage.z[parentIndex]));
             if (componentStorage.parentIndex[parentIndex] !== null) {
-                parentTransform = getTransformRecursive(componentStorage.parentIndex[parentIndex], componentStorage);
+                let parentTransform = getTransformRecursive(componentStorage.parentIndex[parentIndex], componentStorage);
                 mat4.multiply(currentTransform, parentTransform, currentTransform);
             }
             return currentTransform;

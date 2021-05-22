@@ -38,7 +38,7 @@ class VisualObject extends WorldObject {
         gl.drawElements(gl.TRIANGLES, this.renderData.indicesLength, gl.UNSIGNED_SHORT, 0);
 
         for (let child of this.children) {
-            child.draw(gl, program, this.position, this.rotation);
+            child.draw(gl, program, mat4.getTranslation(vec3.create(), model), mat4.getRotation(quat.create(), model));
         }
     }
 
